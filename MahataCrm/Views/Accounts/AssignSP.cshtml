@@ -1,0 +1,82 @@
+﻿@model CrmMahata.Models.Account
+
+@{
+    ViewData["Title"] = "AssignSP";
+}
+
+<h1>Assign Service Plan</h1>
+
+<div>
+    <h4>Account</h4>
+    <hr />
+    <div class="row">
+        <div class="col-sm-6">
+            <dl class="row">
+                <dt class="col-sm-4">
+                    @Html.DisplayNameFor(model => model.IdAcc)
+                </dt>
+                <dd class="col-sm-8">
+                    @Html.DisplayFor(model => model.IdAcc)
+                </dd>
+                <dt class="col-sm-4">
+                    @Html.DisplayNameFor(model => model.BusinessName)
+                </dt>
+                <dd class="col-sm-8">
+                    @Html.DisplayFor(model => model.BusinessName)
+                </dd>
+                <dt class="col-sm-4">
+                    @Html.DisplayNameFor(model => model.Address)
+                </dt>
+                <dd class="col-sm-8">
+                    @Html.DisplayFor(model => model.Address)
+                </dd>
+                <dt class="col-sm-4">
+                    @Html.DisplayNameFor(model => model.Phone)
+                </dt>
+                <dd class="col-sm-8">
+                    @Html.DisplayFor(model => model.Phone)
+                </dd>
+            </dl>
+        </div>
+        <div class="col-sm-6">
+            <dl class="row">
+                <dt class="col-sm-4">
+                    @Html.DisplayNameFor(model => model.Email)
+                </dt>
+                <dd class="col-sm-8">
+                    @Html.DisplayFor(model => model.Email)
+                </dd>
+                <dt class="col-sm-4">
+                    @Html.DisplayNameFor(model => model.WebSite)
+                </dt>
+                <dd class="col-sm-8">
+                    @Html.DisplayFor(model => model.WebSite)
+                </dd>
+                <dt class="col-sm-4">
+                    @Html.DisplayNameFor(model => model.Status)
+                </dt>
+                <dd class="col-sm-8">
+                    @Html.DisplayFor(model => model.Status)
+                </dd>
+                <dt class="col-sm-4">
+                    @Html.DisplayNameFor(model => model.ServicePlan)
+                </dt>
+                <dd class="col-sm-8">
+                    @Html.DisplayFor(model => model.ServicePlan.Name)
+                </dd>
+            </dl>
+        </div>
+    </div>
+</div>
+<form asp-action="AssignSP">
+    <div class="col-lg-4">
+        <div class="form-group">
+            <input type="hidden" asp-for="Id"/>
+            <select asp-for="ServicePlanID" asp-items="ViewBag.ServicePlanID" class="form-control mb-2"></select>
+            <input type="submit" value="Assign" class="btn btn-primary" /> |
+            <a asp-action="Index">Back to List</a>
+        </div>
+    </div>
+    
+    
+</form>

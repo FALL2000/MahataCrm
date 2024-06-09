@@ -1,0 +1,95 @@
+﻿@model CrmMahata.Models.Account
+
+@{
+    ViewData["Title"] = "Block";
+}
+
+<h1>
+    @if (@Model.Status == 0)
+    {
+        <span>Block</span>
+    }
+    else
+    {
+        <span>UnBlock</span>
+    }
+</h1>
+
+<h3>Are you sure you want to 
+    @if (@Model.Status == 0)
+    {
+        <span>Block</span>
+    }
+    else
+    {
+        <span>UnBlock</span>
+    }
+    this ?
+</h3>
+<div>
+    <h4>Account</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.IdAcc)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.IdAcc)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.BusinessName)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.BusinessName)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Address)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Address)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Phone)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Phone)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Email)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Email)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.WebSite)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.WebSite)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Status)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Status)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.ServicePlan)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.ServicePlan.Name)
+        </dd>
+    </dl>
+
+    <form asp-action="Block">
+        <input type="hidden" asp-for="Id" />
+        @if (@Model.Status == 0)
+        {
+            <input type="submit" value="Block" class="btn btn-danger" />
+        }
+        else
+        {
+          <input type="submit" value="UnBlock" class="btn btn-danger" />
+        }
+        | <a asp-action="Index">Back to List</a>
+    </form>
+</div>

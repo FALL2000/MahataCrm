@@ -1,0 +1,72 @@
+﻿@model MahataCrm.Models.OperatorEditModel
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Operator</h1>
+
+<h4>Edit Operator</h4>
+<hr />
+
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <form asp-action="Edit">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" asp-for="IdOp" />
+                <div class="form-group row">
+                    <div class="col-sm-4">
+                        <label asp-for="Name" class="control-label"></label>
+                    </div>
+                    <div class="col-sm-8">
+                        <input asp-for="Name" class="form-control" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-sm-4">
+                        <label asp-for="Email" class="control-label"></label>
+                    </div>
+                    <div class="col-sm-8">
+                        <input asp-for="Email" class="form-control"/>
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-sm-4">
+                        <label asp-for="Role" class="control-label"></label>
+                    </div>
+                    <div class="col-sm-8">
+                        <select asp-for="Role" class="form-control">
+                            <option value="ADMIN">Admin</option>
+                            <option value="AUDITOR">Auditor</option>
+                        </select>
+                        <span asp-validation-for="Role" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-sm-4"></div>
+                    <div class="col-sm-8">
+                        <input type="submit" value="Edit" class="btn btn-primary" />
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-sm-4"></div>
+                    <div class="col-sm-8">
+                        <a asp-action="Index">Back to List</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+
+

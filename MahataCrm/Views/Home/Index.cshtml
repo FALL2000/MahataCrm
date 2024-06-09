@@ -1,0 +1,182 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<h3>Dashboard</h3>
+
+<div class="row">
+
+    
+
+    <!-- Pie Chart -->
+    <div class="col-xl-6 col-lg-6">
+        <div class="card shadow mb-4">
+            <!-- Card Header - Dropdown -->
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">Business Account Stats</h6>
+            </div>
+            <!-- Card Body -->
+            <div class="card-body">
+                <div class="chart-pie pt-4 pb-2">
+                    <div class="chartjs-size-monitor"><div class="chartjs-size-monitor-expand"><div class=""></div></div><div class="chartjs-size-monitor-shrink"><div class=""></div></div></div>
+                    <canvas id="AccountChart" width="327" height="306" style="display: block; height: 245px; width: 262px;" class="chartjs-render-monitor"></canvas>
+                </div>
+                <div class="mt-4 text-center small">
+                    <span class="mr-2">
+                        <i class="fas fa-circle text-primary"></i> Active
+                    </span>
+                    <span class="mr-2">
+                        <i class="fas fa-circle text-success"></i> Inactive
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-6 col-lg-6">
+        <div class="card shadow mb-4">
+            <!-- Card Header - Dropdown -->
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">Operator Stats</h6>
+            </div>
+            <!-- Card Body -->
+            <div class="card-body">
+                <div class="chart-pie pt-4 pb-2">
+                    <div class="chartjs-size-monitor"><div class="chartjs-size-monitor-expand"><div class=""></div></div><div class="chartjs-size-monitor-shrink"><div class=""></div></div></div>
+                    <canvas id="OperatorChart" width="327" height="306" style="display: block; height: 245px; width: 262px;" class="chartjs-render-monitor"></canvas>
+                </div>
+                <div class="mt-4 text-center small">
+                    <span class="mr-2">
+                        <i class="fas fa-circle text-primary"></i> Super Admin
+                    </span>
+                    <span class="mr-2">
+                        <i class="fas fa-circle text-success"></i> Admin
+                    </span>
+                    <span class="mr-2">
+                        <i class="fas fa-circle text-info"></i> Auditor
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script>
+        Chart.defaults.global.defaultFontFamily = 'Nunito', '-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif';
+        Chart.defaults.global.defaultFontColor = '#858796';
+
+        var accounts = @Html.Raw(Json.Serialize(ViewData["Account"]));
+        console.log(accounts);
+        var operators = @Html.Raw(Json.Serialize(ViewData["Operator"]));
+        console.log(operators);
+        var labelsAccount = [];
+        var labelsOperator = [];
+        var dataAccount = [];
+        var dataOperator = [];
+        var bgColorsAccount = [];
+        var bgColorsOperator = [];
+        var bghColorsAccount = [];
+        var bghColorsOperator = [];
+
+
+        accounts.forEach(account => {
+            if (account.status == 0) {
+                labelsAccount.push("Active");
+                dataAccount.push(account.count);
+                bgColorsAccount.push('#4e73df');
+                bghColorsAccount.push('#2e59d9');
+            }
+            if (account.status == 1) {
+                labelsAccount.push("Inactive");
+                dataAccount.push(account.count);
+                bgColorsAccount.push('#1cc88a');
+                bghColorsAccount.push('#17a673');
+            }
+        });
+
+        operators.forEach(operator => {
+            if (operator.typeOperator == "Super Admin") {
+                labelsOperator.push("Super Admin");
+                dataOperator.push(operator.count);
+                bgColorsOperator.push('#4e73df');
+                bghColorsAccount.push('#2e59d9');
+            }
+            if (operator.typeOperator == "Admin") {
+                labelsOperator.push("Admin");
+                dataOperator.push(operator.count);
+                bgColorsOperator.push('#1cc88a');
+                bghColorsOperator.push('#17a673');
+            }
+            if (operator.typeOperator == "Auditor") {
+                labelsOperator.push("Auditor");
+                dataOperator.push(operator.count);
+                bgColorsOperator.push('#36b9cc');
+                bghColorsOperator.push('#2c9faf');
+            }
+        });
+        
+
+        // Pie Chart Example
+        var accountChart = document.getElementById("AccountChart");
+        var operatorChart = document.getElementById("OperatorChart");
+        var accountPieChart = new Chart(accountChart, {
+            type: 'doughnut',
+            data: {
+                labels: labelsAccount,
+                datasets: [{
+                    data: dataAccount,
+                    backgroundColor: bgColorsAccount,
+                    hoverBackgroundColor: bghColorsAccount,
+                    hoverBorderColor: "rgba(234, 236, 244, 1)",
+                }],
+            },
+            options: {
+                maintainAspectRatio: false,
+                tooltips: {
+                    backgroundColor: "rgb(255,255,255)",
+                    bodyFontColor: "#858796",
+                    borderColor: '#dddfeb',
+                    borderWidth: 1,
+                    xPadding: 15,
+                    yPadding: 15,
+                    displayColors: false,
+                    caretPadding: 10,
+                },
+                legend: {
+                    display: false
+                },
+                cutoutPercentage: 80,
+            },
+        });
+
+        var operatorPieChart = new Chart(operatorChart, {
+            type: 'doughnut',
+            data: {
+                labels: labelsOperator,
+                datasets: [{
+                    data: dataOperator,
+                    backgroundColor: bgColorsOperator,
+                    hoverBackgroundColor: bghColorsOperator,
+                    hoverBorderColor: "rgba(234, 236, 244, 1)",
+                }],
+            },
+            options: {
+                maintainAspectRatio: false,
+                tooltips: {
+                    backgroundColor: "rgb(255,255,255)",
+                    bodyFontColor: "#858796",
+                    borderColor: '#dddfeb',
+                    borderWidth: 1,
+                    xPadding: 15,
+                    yPadding: 15,
+                    displayColors: false,
+                    caretPadding: 10,
+                },
+                legend: {
+                    display: false
+                },
+                cutoutPercentage: 80,
+            },
+        });
+    </script>
+ }
