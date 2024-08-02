@@ -1,0 +1,81 @@
+﻿@model MahataCrm.Models.Receipt
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<h4>Receipt</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group">
+                <label asp-for="RctNum" class="control-label"></label>
+                <input asp-for="RctNum" class="form-control" />
+                <span asp-validation-for="RctNum" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Znum" class="control-label"></label>
+                <input asp-for="Znum" class="form-control" />
+                <span asp-validation-for="Znum" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="RctDate" class="control-label"></label>
+                <input asp-for="RctDate" class="form-control" />
+                <span asp-validation-for="RctDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="RctTime" class="control-label"></label>
+                <input asp-for="RctTime" class="form-control" />
+                <span asp-validation-for="RctTime" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TotalTaxExcl" class="control-label"></label>
+                <input asp-for="TotalTaxExcl" class="form-control" />
+                <span asp-validation-for="TotalTaxExcl" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TotalTaxIncl" class="control-label"></label>
+                <input asp-for="TotalTaxIncl" class="form-control" />
+                <span asp-validation-for="TotalTaxIncl" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CustName" class="control-label"></label>
+                <input asp-for="CustName" class="form-control" />
+                <span asp-validation-for="CustName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CustIdType" class="control-label"></label>
+                <input asp-for="CustIdType" class="form-control" />
+                <span asp-validation-for="CustIdType" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CustId" class="control-label"></label>
+                <input asp-for="CustId" class="form-control" />
+                <span asp-validation-for="CustId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CustNum" class="control-label"></label>
+                <input asp-for="CustNum" class="form-control" />
+                <span asp-validation-for="CustNum" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="AccountID" class="control-label"></label>
+                <select asp-for="AccountID" class="form-control" asp-items="ViewBag.AccountID"></select>
+                <span asp-validation-for="AccountID" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+

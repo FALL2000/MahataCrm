@@ -15,6 +15,10 @@ namespace MahataCrm.Data
 
         public DbSet<Account> Accounts { get; set; }
         public DbSet<ServicePlan> Services { get; set; }
+        public DbSet<OperatorMatchAccount> OperatorMatchs { get; set; }
+        public DbSet<Receipt> Receipts { get; set; }
+        public DbSet<Log> Logs { get; set; }
+        public DbSet<ReceiptItem> ReceiptItems { get; set; }
         public DbSet<MahataCrm.Models.OperatorCreateViewModel> OperatorCreateViewModel { get; set; } = default!;
         public DbSet<MahataCrm.Models.LoginViewModel> LoginViewModel { get; set; } = default!;
         public DbSet<MahataCrm.Models.OperatorViewModel> OperatorViewModel { get; set; } = default!;

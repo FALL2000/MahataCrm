@@ -1,5 +1,8 @@
-﻿namespace MahataCrm.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace MahataCrm.Models
 {
+    [NotMapped]
     public class OperatorViewModel
     {
         public string Id { get; set; }

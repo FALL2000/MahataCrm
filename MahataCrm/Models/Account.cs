@@ -3,6 +3,8 @@ using MahataCrm.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Security.Policy;
 
@@ -15,22 +17,41 @@ namespace CrmMahata.Models
         Inactive
     }
 
-    [Index(nameof(IdAcc), IsUnique = true)]
+    
     [Index(nameof(Email), IsUnique = true)]
     public class Account
     {
         public int Id { get; set; }
-        public string IdAcc { get; set; }
         public string BusinessName { get; set; }
         public string Address { get; set; }
         public int Phone { get; set; }
         public string Email { get; set; }
         public string WebSite { get; set; }
         public StatusType Status { get; set; }
+        public int Tin { get; set; }
+        public string Certkey { get; set; }
+        public string RegId { get; set; }
+        public string Vrn { get; set; }
+        public string Serial { get; set; }
+        public string Uin { get; set; }
+        public string? Country { get; set; }
+        public string? City { get; set; }
+        public int? Gc { get; set; }
+        public string TaxOffice {  get; set; }
+        [DataType(DataType.Password)]
+        [StringLength(12, ErrorMessage = "The password must be at least 8 and at max 12 characters long.", MinimumLength = 8)]
+        [NotMapped]
+        public string Password { get; set; }
+
+        [DataType(DataType.Password)]
+        [NotMapped]
+        [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
+        public String ConfirmPassword { get; set; }
         public int? ServicePlanID { get; set; }
         public ServicePlan ServicePlan { get; set; }
         [ForeignKey("Operator")]
-        public String OperatorID { get; set; }
+        public string OperatorID { get; set; }
         public Operator Operator { get; set; }
+        public ICollection<Receipt> Receipts { get; set; }
     }
 }

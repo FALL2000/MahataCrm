@@ -1,0 +1,100 @@
+﻿@model MahataCrm.Models.SignatureModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Certificate</h1>
+<hr />
+<h4>Upload Certificate</h4>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <form id="certForm" enctype="multipart/form-data" asp-action="UploadCertificate">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input asp-for="DistinguishedName" class="form-control" type="hidden" id="distinguishedName" name="distinguishedName" />
+                <input asp-for="SerialNumber" class="form-control" type="hidden" id="serialNumber" name="serialNumber" />
+                <input asp-for="Signature" class="form-control" type="hidden" id="signature" name="signature" />
+                <div class="form-group row">
+                    <div class="col-sm-4">
+                        <label for="Certfile" class="control-label">Upload your certificate (PFX)</label>
+                    </div>
+                    <div class="col-sm-8">
+                        <input type="file" id="certFile" name="certFile" accept=".pfx" class="form-control" placeholder="Certificate" required />
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-sm-4">
+                        <label for="certPassword">Certificate Password:</label>
+                    </div>
+                    <div class="col-sm-8">
+                        <input type="password" id="certPassword" class="form-control" name="certPassword" placeholder="Certificate Password" required>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-sm-4"></div>
+                    <div class="col-sm-8">
+                        <button type="button" onclick="processCertificate()" class="btn btn-primary">Submit</button>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-sm-4"></div>
+                    <div class="col-sm-8">
+                        <a asp-action="Index">Back to List</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        async function processCertificate() {
+            const fileInput = document.getElementById('certFile');
+            const password = document.getElementById('certPassword').value;
+
+            if (fileInput.files.length === 0) {
+                alert('Please select a certificate file.');
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function (event) {
+                const p12Der = event.target.result;
+                const p12Asn1 = forge.asn1.fromDer(p12Der);
+                const p12 = forge.pkcs12.pkcs12FromAsn1(p12Asn1, false, password);
+
+                // Get the certificate and private key
+                const bags = p12.getBags({ bagType: forge.pki.oids.certBag });
+                const cert = bags[forge.pki.oids.certBag][0].cert;
+
+                const keyBags = p12.getBags({ bagType: forge.pki.oids.pkcs8ShroudedKeyBag });
+                const privateKey = keyBags[forge.pki.oids.pkcs8ShroudedKeyBag][0].key;
+
+                // Extract certificate details
+                const distinguishedName = cert.subject.attributes.map(attr => `${attr.shortName}=${attr.value}`).join(', '); alert("distinguishedName" + distinguishedName);
+                const serialNumber = cert.serialNumber; alert("serialNumber" + serialNumber);
+
+                // Sign form data
+                const dataToSign = `${distinguishedName}|${serialNumber}`;
+                const md = forge.md.sha256.create();
+                md.update(dataToSign, 'utf8');
+                const signature = forge.util.encode64(privateKey.sign(md));
+
+                // Set hidden fields
+                document.getElementById('distinguishedName').value = distinguishedName;
+                document.getElementById('serialNumber').value = serialNumber;
+                document.getElementById('signature').value = signature;
+
+                // Submit the form
+                document.getElementById('certForm').submit();
+            };
+
+            reader.readAsBinaryString(file);
+        }
+    </script>
+}

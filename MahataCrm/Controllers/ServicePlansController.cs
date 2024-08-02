@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using CrmMahata.Models;
 using MahataCrm.Data;
 using Microsoft.AspNetCore.Authorization;
+using MahataCrm.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace MahataCrm.Controllers
 {
@@ -15,10 +17,12 @@ namespace MahataCrm.Controllers
     public class ServicePlansController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<Operator> _userManager;
 
-        public ServicePlansController(ApplicationDbContext context)
+        public ServicePlansController(ApplicationDbContext context, UserManager<Operator> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: ServicePlans
@@ -62,7 +66,15 @@ namespace MahataCrm.Controllers
         {
             //if (ModelState.IsValid)
             //{
+            var CurrentUser = await _userManager.GetUserAsync(HttpContext.User);
             _context.Add(servicePlan);
+            Log log = new Log();
+            log.Action = "Create";
+            log.TimeAction = DateTime.Now;
+            log.DateAction = DateTime.Now.Date;
+            log.ActionOn = "Service Plan";
+            log.OperatorID = CurrentUser.Id;
+            _context.Add(log);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
             // }
@@ -94,6 +106,7 @@ namespace MahataCrm.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Duration,Price")] ServicePlan servicePlan)
         {
+            var CurrentUser = await _userManager.GetUserAsync(HttpContext.User);
             if (id != servicePlan.Id)
             {
                 return NotFound();
@@ -117,6 +130,13 @@ namespace MahataCrm.Controllers
                     throw;
                 }
             }
+            Log log = new Log();
+            log.Action = "Edit";
+            log.TimeAction = DateTime.Now;
+            log.DateAction = DateTime.Now.Date;
+            log.ActionOn = "Service Plan";
+            log.OperatorID = CurrentUser.Id;
+            _context.Add(log);
             return RedirectToAction(nameof(Index));
             //}
             //return View(servicePlan);
@@ -148,11 +168,18 @@ namespace MahataCrm.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var servicePlan = await _context.Services.FindAsync(id);
+            var CurrentUser = await _userManager.GetUserAsync(HttpContext.User);
             if (servicePlan != null)
             {
                 _context.Services.Remove(servicePlan);
             }
-
+            Log log = new Log();
+            log.Action = "Delete";
+            log.TimeAction = DateTime.Now;
+            log.DateAction = DateTime.Now.Date;
+            log.ActionOn = "Service Plan";
+            log.OperatorID = CurrentUser.Id;
+            _context.Add(log);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }

@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34728.123
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MahataCrm", "MahataCrm\MahataCrm.csproj", "{4489CF06-EFA9-4446-B9AD-877B796799FC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MahataCrm", "MahataCrm\MahataCrm.csproj", "{4489CF06-EFA9-4446-B9AD-877B796799FC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RDLCReport", "RDLCReport\RDLCReport.csproj", "{D66A6086-5C3D-4FBA-8935-53898F90F26C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{4489CF06-EFA9-4446-B9AD-877B796799FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4489CF06-EFA9-4446-B9AD-877B796799FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4489CF06-EFA9-4446-B9AD-877B796799FC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D66A6086-5C3D-4FBA-8935-53898F90F26C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D66A6086-5C3D-4FBA-8935-53898F90F26C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D66A6086-5C3D-4FBA-8935-53898F90F26C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D66A6086-5C3D-4FBA-8935-53898F90F26C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

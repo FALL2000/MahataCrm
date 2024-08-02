@@ -1,0 +1,345 @@
+﻿@model MahataCrm.Models.Receipt
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Receipt</h1>
+
+<h4>New Receipt</h4>
+<hr />
+<!--<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="RctNum" class="control-label"></label>
+                <input asp-for="RctNum" class="form-control" />
+                <span asp-validation-for="RctNum" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Znum" class="control-label"></label>
+                <input asp-for="Znum" class="form-control" />
+                <span asp-validation-for="Znum" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="RctDate" class="control-label"></label>
+                <input asp-for="RctDate" class="form-control" />
+                <span asp-validation-for="RctDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="RctTime" class="control-label"></label>
+                <input asp-for="RctTime" class="form-control" />
+                <span asp-validation-for="RctTime" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TotalTaxExcl" class="control-label"></label>
+                <input asp-for="TotalTaxExcl" class="form-control" />
+                <span asp-validation-for="TotalTaxExcl" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TotalTaxIncl" class="control-label"></label>
+                <input asp-for="TotalTaxIncl" class="form-control" />
+                <span asp-validation-for="TotalTaxIncl" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CustName" class="control-label"></label>
+                <input asp-for="CustName" class="form-control" />
+                <span asp-validation-for="CustName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CustIdType" class="control-label"></label>
+                <input asp-for="CustIdType" class="form-control" />
+                <span asp-validation-for="CustIdType" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CustId" class="control-label"></label>
+                <input asp-for="CustId" class="form-control" />
+                <span asp-validation-for="CustId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CustNum" class="control-label"></label>
+                <input asp-for="CustNum" class="form-control" />
+                <span asp-validation-for="CustNum" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="AccountID" class="control-label"></label>
+                <select asp-for="AccountID" class ="form-control" asp-items="ViewBag.AccountID"></select>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>-->
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <form asp-action="Create">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input asp-for="ReceiptItems" type="hidden" id="receiptItems"/>
+                <div class="form-group row">
+                    <div class="col-sm-6">
+                        <label asp-for="RctNum" class="control-label">Receipt Number</label>
+                        <input asp-for="RctNum" class="form-control" />
+                        <span asp-validation-for="RctNum" class="text-danger"></span>
+                    </div>
+                    <div class="col-sm-6">
+                        <label asp-for="Znum" class="control-label">Z Number</label>
+                        <input asp-for="Znum" class="form-control" />
+                        <span asp-validation-for="Znum" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-sm-6">
+                        <label asp-for="TotalTaxExcl" class="control-label">Total Tax Exclude</label>
+                        <input asp-for="TotalTaxExcl" class="form-control" type="number"/>
+                        <span asp-validation-for="TotalTaxExcl" class="text-danger"></span>
+                    </div>
+                    <div class="col-sm-6">
+                        <label asp-for="TotalTaxIncl" class="control-label">Total Tax Include</label>
+                        <input asp-for="TotalTaxIncl" class="form-control" type="number"/>
+                        <span asp-validation-for="TotalTaxIncl" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-sm-6">
+                        <label asp-for="CustName" class="control-label">Customer Name</label>
+                        <input asp-for="CustName" class="form-control" />
+                        <span asp-validation-for="CustName" class="text-danger"></span>
+                    </div>
+                    <div class="col-sm-6">
+                        <label asp-for="CustIdType" class="control-label">Customer Id Type</label>
+                        <input asp-for="CustIdType" class="form-control" />
+                        <span asp-validation-for="CustIdType" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-sm-6">
+                        <label asp-for="CustId" class="control-label">Customer Id</label>
+                        <input asp-for="CustId" class="form-control" />
+                        <span asp-validation-for="CustId" class="text-danger"></span>
+                    </div>
+                    <div class="col-sm-6">
+                        <label asp-for="CustNum" class="control-label">Customer Number</label>
+                        <input asp-for="CustNum" class="form-control" />
+                        <span asp-validation-for="CustNum" class="text-danger"></span>
+                    </div>
+                </div>
+                <table class="table table-bordered table-striped" id="items-table">
+                    <thead>
+                        <tr>
+                            <th>Description</th>
+                            <th>Price</th>
+                            <th>Quantity</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <input type="text" class="form-control" id="itemsDesc0" />
+                                <span id="description0" class="text-danger"></span>
+                            </td>
+                            <td>
+                                <input class="form-control" type="number" id="itemsPrice0" />
+                                <span id="price0" class="text-danger"></span>
+                            </td>
+                            <td>
+                                <input class="form-control" type="number" id="itemsQty0" />
+                                <span  id="quantity0" class="text-danger"></span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="form-group row">
+                    <div class="col-sm-4">
+                        <button type="button" id="add-item-btn" class="btn btn-primary">Add Item</button>
+                    </div>
+                    <div class="col-sm-4">
+                        <span id="text-confirm">have you finish to add Item?</span> 
+                    </div>
+                    <div class="col-sm-4">
+                        <button type="button" id="confirm-btn" class="btn btn-success">Yes</button>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-sm-4"></div>
+                    <div class="col-sm-8">
+                        <input id="create-btn" type="submit" value="Create" class="btn btn-primary" disabled/>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-sm-4"></div>
+                    <div class="col-sm-8">
+                        <a asp-action="Index">Back to List</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            var receiptItems = [];
+            var IsSave = false;
+            $('#add-item-btn').click(function () {
+                var index = $('#items-table tbody tr').length;
+                console.log(index);
+                var itemsDescription = 'itemsDesc' + index;
+                var itemsPrice = 'itemsPrice' + index;
+                var itemsQty = 'itemsQty' + index;
+                var descriptionId = 'description' + index;
+                var priceId = 'price' + index;
+                var quantityId = 'quantity' + index;
+                var itemsDescAcc = 'itemsDesc' + (index - 1);
+                var itemsPriceAcc = 'itemsPrice' + (index - 1);
+                var itemsQtyAcc = 'itemsQty' + (index - 1);
+                var descriptionIdAcc = 'description' + (index - 1);
+                var priceIdAcc = 'price' + (index - 1);
+                var quantityIdAcc = 'quantity' + (index - 1);
+                var valDesc = $('#' + itemsDescAcc).val();
+                console.log(valDesc);
+                var valPrice = $('#' + itemsPriceAcc).val();
+                console.log(valPrice);
+                var valQty = $('#' + itemsQtyAcc).val();
+                if (valDesc == '') {
+                    $('#' + priceIdAcc).text('');
+                    $('#' + quantityIdAcc).text('');
+                    $('#' + descriptionIdAcc).text('This field is require');
+                } else {
+                    if (valPrice == '') {
+                        $('#' + descriptionIdAcc).text('');
+                        $('#' + quantityIdAcc).text('');
+                        $('#' + priceIdAcc).text('This field is require');
+                    } else {
+                        if (valQty == '') {
+                            $('#' + descriptionIdAcc).text('');
+                            $('#' + priceIdAcc).text('');
+                            $('#' + quantityIdAcc).text('This field is require');
+                        } else {
+                            if (valPrice <= 0) {
+                                $('#' + descriptionIdAcc).text('');
+                                $('#' + quantityIdAcc).text('');
+                                $('#' + priceIdAcc).text('Value of this field must be greather than 0');
+                            } else {
+                                if (valQty <= 0) {
+                                    $('#' + descriptionIdAcc).text('');
+                                    $('#' + priceIdAcc).text('');
+                                    $('#' + quantityIdAcc).text('Value of this field must be greather than 0');
+                                } else {
+                                    $('#' + priceIdAcc).text('');
+                                    $('#' + descriptionIdAcc).text('');
+                                    $('#' + quantityIdAcc).text('');
+                                    if (!IsSave) {
+                                        var newItem = {
+                                            Description: valDesc,
+                                            Price: valPrice,
+                                            Quantity: valQty,
+                                            IsNew: true
+                                        };
+                                        receiptItems.push(newItem);
+                                    } else {
+                                        IsSave = false;
+                                    }
+                                    
+                                    var html = '<tr>' +
+                                        '<td><input type="text" class= "form-control" id="' + itemsDescription + '" /><span id="' + descriptionId + '" class= "text-danger" > </span></td>' +
+                                        '<td><input class= "form-control" id="' + itemsPrice + '" type="number"/><span id="' + priceId + '" class= "text-danger" > </span></td>' +
+                                        '<td><input class= "form-control" id="' + itemsQty + '" type="number"/><span id="' + quantityId + '" class= "text-danger" > </span></td>' +
+                                        '</tr>';
+
+                                    $('#items-table tbody').append(html);
+                                }
+                            }
+                        }
+                    }
+                }
+                
+            });
+            $('#confirm-btn').click(function () {
+                var textConfirm = $('#text-confirm').text();
+                if (textConfirm == 'have you finish to add Item?') {
+                    var index = $('#items-table tbody tr').length;
+                    console.log(index);
+                    var itemsDescAcc = 'itemsDesc' + (index - 1);
+                    var itemsPriceAcc = 'itemsPrice' + (index - 1);
+                    var itemsQtyAcc = 'itemsQty' + (index - 1);
+                    var descriptionIdAcc = 'description' + (index - 1);
+                    var priceIdAcc = 'price' + (index - 1);
+                    var quantityIdAcc = 'quantity' + (index - 1);
+                    var valDesc = $('#' + itemsDescAcc).val();
+                    console.log(valDesc);
+                    var valPrice = $('#' + itemsPriceAcc).val();
+                    console.log(valPrice);
+                    var valQty = $('#' + itemsQtyAcc).val();
+                    if (valDesc == '') {
+                        $('#' + priceIdAcc).text('');
+                        $('#' + quantityIdAcc).text('');
+                        $('#' + descriptionIdAcc).text('This field is require');
+                    } else {
+                        if (valPrice == '') {
+                            $('#' + descriptionIdAcc).text('');
+                            $('#' + quantityIdAcc).text('');
+                            $('#' + priceIdAcc).text('This field is require');
+                        } else {
+                            if (valQty == '') {
+                                $('#' + descriptionIdAcc).text('');
+                                $('#' + priceIdAcc).text('');
+                                $('#' + quantityIdAcc).text('This field is require');
+                            } else {
+                                if (valPrice <= 0) {
+                                    $('#' + descriptionIdAcc).text('');
+                                    $('#' + quantityIdAcc).text('');
+                                    $('#' + priceIdAcc).text('Value of this field must be greather than 0');
+                                } else {
+                                    if (valQty <= 0) {
+                                        $('#' + descriptionIdAcc).text('');
+                                        $('#' + priceIdAcc).text('');
+                                        $('#' + quantityIdAcc).text('Value of this field must be greather than 0');
+                                    } else {
+                                        $('#' + priceIdAcc).text('');
+                                        $('#' + descriptionIdAcc).text('');
+                                        $('#' + quantityIdAcc).text('');
+                                        var newItem = {
+                                            Description: valDesc,
+                                            Price: valPrice,
+                                            Quantity: valQty,
+                                            IsNew: true
+                                        };
+                                        console.log(receiptItems);
+                                        receiptItems.push(newItem);
+                                        $.ajax({
+                                            url: '/Receipts/CreateItem',
+                                            type: 'POST',
+                                            data: { ReceiptItems: receiptItems },
+                                            success: function (response) {
+                                                $('#add-item-btn').prop('disabled', true);
+                                                $('#create-btn').prop('disabled', false);
+                                                $('#text-confirm').text('Do you want to add Item?');
+                                                receiptItems = [];
+                                                IsSave = true;
+                                            },
+                                            error: function (xhr, status, error) {
+                                                console.log(error);
+                                            }
+                                        });
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    $('#add-item-btn').prop('disabled', false);
+                    $('#create-btn').prop('disabled', true);
+                    $('#text-confirm').text('have you finish to add Item?');
+                }
+            });
+        });
+        
+    </script>
+}
+

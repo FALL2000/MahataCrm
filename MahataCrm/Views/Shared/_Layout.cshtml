@@ -55,28 +55,51 @@
 
                 <!-- Divider -->
                 <hr class="sidebar-divider">
+                @if (!User.IsInRole("Bussiness"))
+                {
+                    <!-- Nav Item - Account -->
+                    <li class="nav-item active">
+                        <a class="nav-link" asp-controller="Accounts" asp-action="Index">
+                            <i class="fas fa-fw fa-building"></i>
+                            <span>Account</span>
+                        </a>
+                    </li>
 
-                <!-- Nav Item - Account -->
-                <li class="nav-item active">
-                    <a class="nav-link" asp-controller="Accounts" asp-action="Index">
-                        <i class="fas fa-fw fa-building"></i>
-                        <span>Account</span>
-                    </a>
-                </li>
-
-                <!-- Nav Item - Service Plan -->
-                <li class="nav-item active">
-                    <a class="nav-link" asp-controller="ServicePlans" asp-action="Index">
-                        <i class="fas fa-fw fa-dollar-sign"></i>
-                        <span>Service Plan</span>
-                    </a>
-                </li>
+                    <!-- Nav Item - Service Plan -->
+                    <li class="nav-item active">
+                        <a class="nav-link" asp-controller="ServicePlans" asp-action="Index">
+                            <i class="fas fa-fw fa-dollar-sign"></i>
+                            <span>Service Plan</span>
+                        </a>
+                    </li>
+                }
+                @if (User.IsInRole("Bussiness"))
+                {
+                    <li class="nav-item active">
+                        <a class="nav-link" asp-controller="Receipts" asp-action="Index">
+                            <i class="fas fa-fw fa-dollar-sign"></i>
+                            <span>Receipts</span>
+                        </a>
+                    </li>
+                    <li class="nav-item active">
+                        <a class="nav-link" asp-controller="Accounts" asp-action="Signature">
+                            <i class="fas fa-fw fa-dollar-sign"></i>
+                            <span>Upload Certificate</span>
+                        </a>
+                    </li>
+                }
                 @if(User.IsInRole("Super Admin"))
                 {
                     <li class="nav-item active">
                         <a class="nav-link" asp-controller="Operators" asp-action="Index">
                             <i class="fas fa-fw fa-user"></i>
                             <span>Operator</span>
+                        </a>
+                    </li>
+                    <li class="nav-item active">
+                        <a class="nav-link" asp-controller="Log" asp-action="Index">
+                            <i class="fas fa-fw fa-dollar-sign"></i>
+                            <span>Logs</span>
                         </a>
                     </li>
                 }

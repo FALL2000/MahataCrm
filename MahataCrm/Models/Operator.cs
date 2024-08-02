@@ -14,5 +14,7 @@ namespace MahataCrm.Models
         public String Name { get; set; }
         public StatusOperator Status { get; set; }
         public ICollection<Account> Accounts { get; set; }
+        public ICollection<Log> Logs { get; set; }
+        public ICollection<OperatorMatchAccount> OperatorMatchAccounts { get; set; }
     }
 }

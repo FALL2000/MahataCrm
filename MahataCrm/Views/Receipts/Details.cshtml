@@ -1,0 +1,117 @@
+﻿@model MahataCrm.Models.Receipt
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>Receipt</h4>
+    <hr />
+    <div class="row">
+        <div class="col-sm-6">
+            <dl class="row">
+                <dt class="col-sm-4">
+                    Receipt Number:
+                </dt>
+                <dd class="col-sm-8">
+                    @Html.DisplayFor(model => model.RctNum)
+                </dd>
+                <dt class="col-sm-4">
+                    Z Number:
+                </dt>
+                <dd class="col-sm-8">
+                    @Html.DisplayFor(model => model.Znum)
+                </dd>
+                <dt class="col-sm-4">
+                    Receipt Date:
+                </dt>
+                <dd class="col-sm-8">
+                    @Html.DisplayFor(model => model.RctDate)
+                </dd>
+                <dt class="col-sm-4">
+                    Total Tax Exclude:
+                </dt>
+                <dd class="col-sm-8">
+                    @Html.DisplayFor(model => model.TotalTaxExcl)
+                </dd>
+                <dt class="col-sm-4">
+                    Total Tax Include:
+                </dt>
+                <dd class="col-sm-8">
+                    @Html.DisplayFor(model => model.TotalTaxIncl)
+                </dd>
+            </dl>
+        </div>
+        <div class="col-sm-6">
+            <dl class="row">
+                <dt class="col-sm-4">
+                    Customer Name:
+                </dt>
+                <dd class="col-sm-8">
+                    @Html.DisplayFor(model => model.CustName)
+                </dd>
+                <dt class="col-sm-4">
+                    Customer Id Type:
+                </dt>
+                <dd class="col-sm-8">
+                    @Html.DisplayFor(model => model.CustIdType)
+                </dd>
+                <dt class="col-sm-4">
+                    Customer Id:
+                </dt>
+                <dd class="col-sm-8">
+                    @Html.DisplayFor(model => model.CustId)
+                </dd>
+                <dt class="col-sm-4">
+                    Customer Number:
+                </dt>
+                <dd class="col-sm-8">
+                    @Html.DisplayFor(model => model.CustNum)
+                </dd>
+            </dl>
+        </div>
+    </div>
+</div>
+<hr />
+<h5>Receipt Item</h5>
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">List Receipt Items</h6>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Description</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.ReceiptItems)
+                    {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Description)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Price)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Quantity)
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div>
+    <a href="@Url.Action("DownloadInvoice", "Receipts", new { id = @Model?.Id })">Print</a> |
+    <a asp-action="Index">Back to List</a>
+</div>
