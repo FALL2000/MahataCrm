@@ -4,6 +4,12 @@
     ViewData["Title"] = "Block";
 }
 
+<div class="spinner-container">
+    <div class="spinner-border text-primary" role="status">
+        <span class="sr-only">Load...</span>
+    </div>
+</div>
+
 <h1>
     @if (@Model.Status == 0)
     {
@@ -87,3 +93,17 @@
         | <a asp-action="Index">Back to List</a>
     </form>
 </div>
+
+@section Scripts {
+    <script>
+        // Afficher le spinner lorsque le chargement de la page commence
+        window.addEventListener("load", function () {
+            document.querySelector(".spinner-container").style.display = "none";
+        });
+
+        // Cacher le spinner avant de quitter la page
+        window.addEventListener("beforeunload", function () {
+            document.querySelector(".spinner-container").style.display = "flex";
+        });
+    </script>
+}

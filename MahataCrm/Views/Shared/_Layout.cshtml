@@ -20,6 +20,8 @@
 
     <!-- Custom styles for this template -->
     <link href="~/css/sb-admin-2.min.css" rel="stylesheet">
+    <link href="~/lib/select2/css/select2.min.css" rel="stylesheet" />
+    <link href="https://raw.githack.com/ttskch/select2-bootstrap4-theme/master/dist/select2-bootstrap4.css" rel="stylesheet">
 
     <!-- Custom styles for this page -->
     <link href="~/lib/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
@@ -52,7 +54,6 @@
                         <span>Dashboard</span>
                     </a>
                 </li>
-
                 <!-- Divider -->
                 <hr class="sidebar-divider">
                 @if (!User.IsInRole("Bussiness"))
@@ -76,15 +77,28 @@
                 @if (User.IsInRole("Bussiness"))
                 {
                     <li class="nav-item active">
+                        <a class="nav-link" asp-controller="Customer" asp-action="Index">
+                            <i class="fas fa-fw fa-dollar-sign"></i>
+                            <span>Customers</span>
+                        </a>
+                    </li>
+                    <li class="nav-item active">
+                        <a class="nav-link" asp-controller="Product" asp-action="Index">
+                            <i class="fas fa-fw fa-dollar-sign"></i>
+                            <span>Products</span>
+                        </a>
+                    </li>
+                    <li class="nav-item active">
                         <a class="nav-link" asp-controller="Receipts" asp-action="Index">
                             <i class="fas fa-fw fa-dollar-sign"></i>
                             <span>Receipts</span>
                         </a>
                     </li>
+                   
                     <li class="nav-item active">
-                        <a class="nav-link" asp-controller="Accounts" asp-action="Signature">
+                        <a class="nav-link" asp-controller="Receipts" asp-action="Zreport">
                             <i class="fas fa-fw fa-dollar-sign"></i>
-                            <span>Upload Certificate</span>
+                            <span>Z-Report</span>
                         </a>
                     </li>
                 }
@@ -94,6 +108,12 @@
                         <a class="nav-link" asp-controller="Operators" asp-action="Index">
                             <i class="fas fa-fw fa-user"></i>
                             <span>Operator</span>
+                        </a>
+                    </li>
+                    <li class="nav-item active">
+                        <a class="nav-link" asp-controller="Profils" asp-action="Index">
+                            <i class="fas fa-fw fa-user"></i>
+                            <span>Profile</span>
                         </a>
                     </li>
                     <li class="nav-item active">
@@ -179,6 +199,8 @@
     <!-- End of Page Wrapper -->
     <!-- Bootstrap core JavaScript-->
     <script src="~/lib/vendor/jquery/jquery.min.js"></script>
+    <script src="~/lib/select2/js/select2.full.min.js"></script>
+    <script src="~/js/select2.js"></script>
     <script src="~/lib/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
     <!-- Core plugin JavaScript-->

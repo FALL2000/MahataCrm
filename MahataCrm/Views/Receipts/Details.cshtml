@@ -7,7 +7,10 @@
 <h1>Details</h1>
 
 <div>
-    <h4>Receipt</h4>
+    @if (!@Model.isPost)
+    {
+        <a asp-action="PostReceipt" asp-route-id="@Model?.Id" class="btn btn-primary">Post Receipt</a>
+    }
     <hr />
     <div class="row">
         <div class="col-sm-6">
@@ -21,9 +24,17 @@
                 <dt class="col-sm-4">
                     Z Number:
                 </dt>
-                <dd class="col-sm-8">
-                    @Html.DisplayFor(model => model.Znum)
-                </dd>
+                @if (!@Model.isPost)
+                {
+                    <dd class="col-sm-8">------</dd>
+                }
+                else
+                {
+                    <dd class="col-sm-8">
+                        @Html.DisplayFor(model => model.Znum)
+                    </dd>
+                }
+                
                 <dt class="col-sm-4">
                     Receipt Date:
                 </dt>
@@ -31,21 +42,55 @@
                     @Html.DisplayFor(model => model.RctDate)
                 </dd>
                 <dt class="col-sm-4">
+                    Total Tax:
+                </dt>
+                @if (!@Model.isPost)
+                {
+                    <dd class="col-sm-8">------</dd>
+                }
+                else
+                {
+                    <dd class="col-sm-8">
+                        @Html.DisplayFor(model => model.TotalTax)
+                    </dd>
+                }
+                <dt class="col-sm-4">
                     Total Tax Exclude:
                 </dt>
-                <dd class="col-sm-8">
-                    @Html.DisplayFor(model => model.TotalTaxExcl)
-                </dd>
+                @if (!@Model.isPost)
+                {
+                    <dd class="col-sm-8">------</dd>
+                }
+                else
+                {
+                    <dd class="col-sm-8">
+                        @Html.DisplayFor(model => model.TotalTaxExcl)
+                    </dd>
+                }
+                
                 <dt class="col-sm-4">
                     Total Tax Include:
                 </dt>
-                <dd class="col-sm-8">
-                    @Html.DisplayFor(model => model.TotalTaxIncl)
-                </dd>
+                @if (!@Model.isPost)
+                {
+                    <dd class="col-sm-8">------</dd>
+                }
+                else
+                {
+                    <dd class="col-sm-8">
+                        @Html.DisplayFor(model => model.TotalTaxIncl)
+                    </dd>
+                }
             </dl>
         </div>
         <div class="col-sm-6">
             <dl class="row">
+                <dt class="col-sm-4">
+                    Payment Type:
+                </dt>
+                <dd class="col-sm-8">
+                    @Html.DisplayFor(model => model.PaymentType)
+                </dd>
                 <dt class="col-sm-4">
                     Customer Name:
                 </dt>
@@ -63,12 +108,6 @@
                 </dt>
                 <dd class="col-sm-8">
                     @Html.DisplayFor(model => model.CustId)
-                </dd>
-                <dt class="col-sm-4">
-                    Customer Number:
-                </dt>
-                <dd class="col-sm-8">
-                    @Html.DisplayFor(model => model.CustNum)
                 </dd>
             </dl>
         </div>
@@ -88,6 +127,9 @@
                         <th>Description</th>
                         <th>Price</th>
                         <th>Quantity</th>
+                        <th>Tax</th>
+                        <th>Tax Code</th>
+                        <th>Discount Amount</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -103,6 +145,15 @@
                             <td>
                                 @Html.DisplayFor(modelItem => item.Quantity)
                             </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Tax)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.TaxCode)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.DiscountAmount)
+                            </td>
                         </tr>
                     }
                 </tbody>
@@ -112,6 +163,10 @@
 </div>
 
 <div>
-    <a href="@Url.Action("DownloadInvoice", "Receipts", new { id = @Model?.Id })">Print</a> |
+    <a href="@Url.Action("DownloadInvoice", "Receipts", new { id = @Model?.Id })" class="btn btn-primary">Print</a> |
+    @if (!@Model.isPost)
+    {
+        <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-primary">Edit</a>
+    }
     <a asp-action="Index">Back to List</a>
 </div>

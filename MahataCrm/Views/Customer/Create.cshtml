@@ -1,0 +1,77 @@
+﻿@using System.Reflection
+@model MahataCrm.Models.Customer
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+@functions {
+    public static string GetEnumDisplayName(Enum value)
+    {
+        FieldInfo field = value.GetType().GetField(value.ToString());
+        EnumDisplayNameAttribute attribute = field.GetCustomAttribute<EnumDisplayNameAttribute>();
+        return attribute != null ? attribute.DisplayName : value.ToString();
+    }
+}
+
+<h1>Customer</h1>
+
+<h4>New Customer</h4>
+<hr />
+<div class="container">
+    <form asp-action="Create">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">   
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group row">
+                    <div class="col-sm-6">
+                        <label asp-for="FirstName" class="control-label">First Name</label>
+                        <input asp-for="FirstName" class="form-control" />
+                        <span asp-validation-for="FirstName" class="text-danger"></span>
+                    </div>
+                    <div class="col-sm-6">
+                        <label asp-for="LastName" class="control-label">Last Name</label>
+                        <input asp-for="LastName" class="form-control" />
+                        <span asp-validation-for="LastName" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-sm-6">
+                        <label asp-for="CustIdType" class="control-label">Customer Id Type</label>
+                        <select asp-for="CustIdType" class="form-control">
+                            @foreach (var value in Enum.GetValues(typeof(CustIdType)))
+                            {
+                                <option value="@value">@GetEnumDisplayName((CustIdType)value)</option>
+                            }
+                        </select>
+                        <span asp-validation-for="CustIdType" class="text-danger"></span>
+                    </div>
+                    <div class="col-sm-6">
+                        <label asp-for="CustId" class="control-label">Customer Id</label>
+                        <input asp-for="CustId" class="form-control" />
+                        <span asp-validation-for="CustId" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-sm-6">
+                        <label asp-for="CustNum" class="control-label">Customer Number</label>
+                        <input asp-for="CustNum" class="form-control" />
+                        <span asp-validation-for="CustNum" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-sm-4"></div>
+                    <div class="col-sm-8">
+                        <input type="submit" value="Create" class="btn btn-primary"/>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-sm-4"></div>
+                    <div class="col-sm-8">
+                        <a asp-action="Index">Back to List</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

@@ -40,20 +40,14 @@ namespace MahataCrm.Data.Migrations
 
                     b.Property<string>("Certkey")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("City")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Country")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
-
-                    b.Property<int?>("Gc")
-                        .HasColumnType("int");
 
                     b.Property<string>("OperatorID")
                         .IsRequired()
@@ -87,6 +81,9 @@ namespace MahataCrm.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Vrn")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -97,12 +94,21 @@ namespace MahataCrm.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Certkey")
+                        .IsUnique();
+
                     b.HasIndex("Email")
                         .IsUnique();
 
                     b.HasIndex("OperatorID");
 
+                    b.HasIndex("Phone")
+                        .IsUnique();
+
                     b.HasIndex("ServicePlanID");
+
+                    b.HasIndex("Tin")
+                        .IsUnique();
 
                     b.ToTable("Accounts");
                 });
@@ -128,6 +134,42 @@ namespace MahataCrm.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Services");
+                });
+
+            modelBuilder.Entity("MahataCrm.Models.Customer", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AccountID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CustId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("CustIdType")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("CustNum")
+                        .HasColumnType("int");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccountID");
+
+                    b.ToTable("Customers");
                 });
 
             modelBuilder.Entity("MahataCrm.Models.Log", b =>
@@ -188,6 +230,113 @@ namespace MahataCrm.Data.Migrations
                     b.ToTable("OperatorMatchs");
                 });
 
+            modelBuilder.Entity("MahataCrm.Models.Opt", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("createdAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("optMail")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("optPass")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("otp")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("userId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Opts");
+                });
+
+            modelBuilder.Entity("MahataCrm.Models.Product", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AccountID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double>("Price")
+                        .HasColumnType("float");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccountID");
+
+                    b.ToTable("Products");
+                });
+
+            modelBuilder.Entity("MahataCrm.Models.Profil", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<bool>("isAssignServicePlan")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("isBlockAccount")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("isCreateAccount")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("isCreateServicePlan")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("isDeleteAccount")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("isDeleteServicePlan")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("isUpdateAccount")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("isUpdateServicePlan")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("isViewAccount")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("isViewServicePlan")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("Profils");
+                });
+
             modelBuilder.Entity("MahataCrm.Models.Receipt", b =>
                 {
                     b.Property<int>("Id")
@@ -214,6 +363,12 @@ namespace MahataCrm.Data.Migrations
                     b.Property<int?>("CustNum")
                         .HasColumnType("int");
 
+                    b.Property<string>("LinkVerification")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("PaymentType")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("RctDate")
                         .HasColumnType("datetime2");
 
@@ -224,15 +379,20 @@ namespace MahataCrm.Data.Migrations
                     b.Property<TimeSpan>("RctTime")
                         .HasColumnType("time");
 
-                    b.Property<double>("TotalTaxExcl")
+                    b.Property<double?>("TotalTax")
                         .HasColumnType("float");
 
-                    b.Property<double>("TotalTaxIncl")
+                    b.Property<double?>("TotalTaxExcl")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("TotalTaxIncl")
                         .HasColumnType("float");
 
                     b.Property<string>("Znum")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("isPost")
+                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 
@@ -249,9 +409,15 @@ namespace MahataCrm.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Code")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<double>("DiscountAmount")
+                        .HasColumnType("float");
 
                     b.Property<bool>("IsNew")
                         .HasColumnType("bit");
@@ -265,11 +431,43 @@ namespace MahataCrm.Data.Migrations
                     b.Property<int?>("ReceiptID")
                         .HasColumnType("int");
 
+                    b.Property<double>("Tax")
+                        .HasColumnType("float");
+
+                    b.Property<int>("TaxCode")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ReceiptID");
 
                     b.ToTable("ReceiptItems");
+                });
+
+            modelBuilder.Entity("MahataCrm.Models.Souscription", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AccountID")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("DateSouscription")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ServicePlanID")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccountID");
+
+                    b.HasIndex("ServicePlanID");
+
+                    b.ToTable("Souscriptions");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -483,12 +681,20 @@ namespace MahataCrm.Data.Migrations
                 {
                     b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
 
+                    b.Property<bool>("HaveConnexion")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("ProfilID")
+                        .HasColumnType("int");
+
                     b.Property<int>("Status")
                         .HasColumnType("int");
+
+                    b.HasIndex("ProfilID");
 
                     b.HasDiscriminator().HasValue("Operator");
                 });
@@ -508,6 +714,17 @@ namespace MahataCrm.Data.Migrations
                     b.Navigation("Operator");
 
                     b.Navigation("ServicePlan");
+                });
+
+            modelBuilder.Entity("MahataCrm.Models.Customer", b =>
+                {
+                    b.HasOne("CrmMahata.Models.Account", "Account")
+                        .WithMany("Customers")
+                        .HasForeignKey("AccountID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Account");
                 });
 
             modelBuilder.Entity("MahataCrm.Models.Log", b =>
@@ -532,6 +749,17 @@ namespace MahataCrm.Data.Migrations
                     b.Navigation("Operator");
                 });
 
+            modelBuilder.Entity("MahataCrm.Models.Product", b =>
+                {
+                    b.HasOne("CrmMahata.Models.Account", "Account")
+                        .WithMany("Products")
+                        .HasForeignKey("AccountID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Account");
+                });
+
             modelBuilder.Entity("MahataCrm.Models.Receipt", b =>
                 {
                     b.HasOne("CrmMahata.Models.Account", "Account")
@@ -550,6 +778,25 @@ namespace MahataCrm.Data.Migrations
                         .HasForeignKey("ReceiptID");
 
                     b.Navigation("Receipt");
+                });
+
+            modelBuilder.Entity("MahataCrm.Models.Souscription", b =>
+                {
+                    b.HasOne("CrmMahata.Models.Account", "Account")
+                        .WithMany()
+                        .HasForeignKey("AccountID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CrmMahata.Models.ServicePlan", "ServicePlan")
+                        .WithMany()
+                        .HasForeignKey("ServicePlanID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Account");
+
+                    b.Navigation("ServicePlan");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -603,14 +850,32 @@ namespace MahataCrm.Data.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("MahataCrm.Models.Operator", b =>
+                {
+                    b.HasOne("MahataCrm.Models.Profil", "Profil")
+                        .WithMany("Operators")
+                        .HasForeignKey("ProfilID");
+
+                    b.Navigation("Profil");
+                });
+
             modelBuilder.Entity("CrmMahata.Models.Account", b =>
                 {
+                    b.Navigation("Customers");
+
+                    b.Navigation("Products");
+
                     b.Navigation("Receipts");
                 });
 
             modelBuilder.Entity("CrmMahata.Models.ServicePlan", b =>
                 {
                     b.Navigation("Accounts");
+                });
+
+            modelBuilder.Entity("MahataCrm.Models.Profil", b =>
+                {
+                    b.Navigation("Operators");
                 });
 
             modelBuilder.Entity("MahataCrm.Models.Receipt", b =>

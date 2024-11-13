@@ -1,0 +1,56 @@
+﻿@model MahataCrm.Models.Customer
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+<div>
+    <h4>Customer</h4>
+    <hr />
+    <div class="row">
+        <div class="col-sm-6">
+            <dl class="row">
+                <dt class="col-sm-4">
+                    First Name:
+                </dt>
+                <dd class="col-sm-8">
+                    @Html.DisplayFor(model => model.FirstName)
+                </dd>
+                <dt class="col-sm-4">
+                    Customer Id Type:
+                </dt>
+                <dd class="col-sm-8">
+                    @Html.DisplayFor(model => model.CustIdType)
+                </dd>
+                <dt class="col-sm-4">
+                    Customer Number:
+                </dt>
+                <dd class="col-sm-8">
+                    @Html.DisplayFor(model => model.CustNum)
+                </dd>
+            </dl>
+        </div>
+        <div class="col-sm-6">
+            <dl class="row">
+                <dt class="col-sm-4">
+                    Last Name:
+                </dt>
+                <dd class="col-sm-8">
+                    @Html.DisplayFor(model => model.LastName)
+                </dd>
+                <dt class="col-sm-4">
+                    Customer Id:
+                </dt>
+                <dd class="col-sm-8">
+                    @Html.DisplayFor(model => model.CustId)
+                </dd>
+            </dl>
+        </div>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

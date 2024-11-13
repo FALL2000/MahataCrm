@@ -13,6 +13,10 @@ using Microsoft.AspNetCore.Authorization;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Cryptography;
 using System.Text;
+using static iText.StyledXmlParser.Jsoup.Select.Evaluator;
+using MahataCrm.Service;
+using Microsoft.AspNetCore.Http;
+using System.Globalization;
 
 namespace MahataCrm.Controllers
 {
@@ -22,20 +26,25 @@ namespace MahataCrm.Controllers
         private readonly ApplicationDbContext _context;
         private readonly UserManager<Operator> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly IEmailSender _emailSender;
 
-        public AccountsController(ApplicationDbContext context, UserManager<Operator> userManager, RoleManager<IdentityRole> roleManager)
+        public AccountsController(ApplicationDbContext context, UserManager<Operator> userManager, RoleManager<IdentityRole> roleManager, IEmailSender emailSender)
         {
             _context = context;
             _userManager = userManager;
             _roleManager = roleManager;
+            _emailSender = emailSender;
         }
 
         // GET: Accounts
         public async Task<IActionResult> Index()
         {
+            
             var CurrentUser = await _userManager.GetUserAsync(HttpContext.User);
-            var myDbContext = _context.Accounts.Include(a => a.ServicePlan).Where(a => a.OperatorID == CurrentUser.Id);
+            var myDbContext = _context.Accounts.Include(a => a.ServicePlan);
             return View(await myDbContext.ToListAsync());
+            
+            
         }
 
         // GET: Accounts/Details/5
@@ -49,11 +58,12 @@ namespace MahataCrm.Controllers
             var account = await _context.Accounts
                 .Include(a => a.ServicePlan)
                 .FirstOrDefaultAsync(m => m.Id == id);
+            var souscriptions = _context.Souscriptions.Where(s => s.AccountID == id).Include(s => s.ServicePlan).ToList();
             if (account == null)
             {
                 return NotFound();
             }
-
+            ViewData["souscriptions"] = souscriptions;
             return View(account);
         }
 
@@ -64,6 +74,19 @@ namespace MahataCrm.Controllers
             ViewData["ServicePlanID"] = new SelectList(_context.Services, "Id", "Id");
             return View();
         }
+
+        private string CreateMessage(string name, string email, string password)
+        {
+            return "<body>\r\n   " +
+                " <p>Hello "+name +",</p>\r\n\r\n   " +
+                " <p>We are delighted to welcome you to Mahita CRM! Your account has been successfully created.</p>\r\n\r\n    <p>Please login with the following credentials:</p>\r\n    " +
+                "<ul>\r\n        <li><strong>Login:</strong>"+ email + "</li>\r\n        <li><strong>Password:</strong>" 
+                + password + "</li>\r\n    " +
+                "</ul>\r\n\r\n    <p>Explore our platform and discover our features :</p>\r\n    " +
+                " <p>We remain at your disposal for any questions or assistance.</p>\r\n\r\n   " +
+                " <p>Thank you for being part of our community!</p>\r\n\r\n    <p>Best regards,,<br>Mahita CRM</p>\r\n</body>\r\n</html>";
+        }
+
 
         // POST: Accounts/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
@@ -76,12 +99,31 @@ namespace MahataCrm.Controllers
 
             //if (ModelState.IsValid)
             //{
+            var existingCertkey = _context.Accounts.FirstOrDefault(a => a.Certkey == account.Certkey);
+            if (existingCertkey != null)
+            {
+                ModelState.AddModelError(string.Empty, "This value of Certkey already exists");
+                return View(account);
+            }
+            var existingTin = _context.Accounts.FirstOrDefault(a => a.Tin == account.Tin);
+            if (existingTin != null)
+            {
+                ModelState.AddModelError(string.Empty, "This value of Tin already exists");
+                return View(account);
+            }
+            var existingPhone = _context.Accounts.FirstOrDefault(a => a.Phone == account.Phone);
+            if (existingPhone != null)
+            {
+                ModelState.AddModelError(string.Empty, "This value of Phone already exists");
+                return View(account);
+            }
             var CurrentUser = await _userManager.GetUserAsync(HttpContext.User);
             if(CurrentUser != null)
             {
                 account.OperatorID = CurrentUser.Id;
             }
             account.Status = StatusType.Active;
+            account.CreatedAt = DateTime.Now.Date;
             _context.Add(account);
             Operator Operator = new Operator();
             Operator.Email = account.Email;
@@ -107,7 +149,11 @@ namespace MahataCrm.Controllers
                 _context.Add(operatorMatchAccount);
                 _context.Add(log);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+
+                await _emailSender.SendEmailAsync("axeltsotie@gmail.com", "Account Created",
+                            CreateMessage(account.BusinessName, account.Email, account.Password));
+                TempData["SuccessMessage"] = "L'enregistrement a été effectué avec succès.";
+                return RedirectToAction("Details", "Accounts", new { id = account.Id });
             }
             else
             {
@@ -162,6 +208,7 @@ namespace MahataCrm.Controllers
                 {
                     account.OperatorID = CurrentUser.Id;
                 }
+                account.UpdatedAt = DateTime.Now.Date;
                 _context.Update(account);
                 Log log = new Log();
                 log.Action = "Edit";
@@ -183,7 +230,7 @@ namespace MahataCrm.Controllers
                     throw;
                 }
             }
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("Details", "Accounts", new { id = account.Id });
             //}
             //ViewData["ServicePlanID"] = new SelectList(_context.Services, "Id", "Id", account.ServicePlanID);
             //return View(account);
@@ -201,6 +248,16 @@ namespace MahataCrm.Controllers
             var account = await _context.Accounts
                 .Include(a => a.ServicePlan)
                 .FirstOrDefaultAsync(m => m.Id == id);
+            var accRep = await _context.Receipts
+                .FirstOrDefaultAsync(m => m.AccountID == id && m.isPost);
+            if (accRep != null)
+            {
+                ViewBag.isDelete = false;
+            }
+            else
+            {
+                ViewBag.isDelete = true;
+            }
             if (account == null)
             {
                 return NotFound();
@@ -230,6 +287,8 @@ namespace MahataCrm.Controllers
             _context.Add(log);
 
             await _context.SaveChangesAsync();
+            await _emailSender.SendEmailAsync("axeltsotie@gmail.com", "Account Deleded",
+                            $"Hello ,'{account.BusinessName}' , Your account deleded successfully");
             return RedirectToAction(nameof(Index));
         }
 
@@ -264,6 +323,7 @@ namespace MahataCrm.Controllers
             if (account != null)
             {
                 account.Status = account.Status == 0 ? StatusType.Inactive : StatusType.Active;
+                account.UpdatedAt = DateTime.Now.Date;
                 try
                 {
                     _context.Update(account);
@@ -281,7 +341,7 @@ namespace MahataCrm.Controllers
                 }
             }
             Log log = new Log();
-            log.Action = "Delete";
+            log.Action = "Edit";
             log.TimeAction = DateTime.Now;
             log.DateAction = DateTime.Now.Date;
             log.ActionOn = "Account";
@@ -289,7 +349,9 @@ namespace MahataCrm.Controllers
             _context.Add(log);
 
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            await _emailSender.SendEmailAsync("axeltsotie@gmail.com", "Account Desactivated",
+                            $"Hello ,'{account.BusinessName}' , Your account Desactivated successfully");
+            return RedirectToAction("Details", "Accounts", new { id = account.Id });
         }
 
         [Authorize(Roles = "Super Admin, Admin")]
@@ -303,6 +365,23 @@ namespace MahataCrm.Controllers
             var account = await _context.Accounts
                 .Include(a => a.ServicePlan)
                 .FirstOrDefaultAsync(m => m.Id == id);
+            var accountSub = _context.Souscriptions.Where(s => s.AccountID == account.Id).OrderByDescending(s => s.DateSouscription).Include(s => s.ServicePlan).FirstOrDefault();
+            if(accountSub != null) {
+                DateTime EndDate = accountSub.DateSouscription.AddDays(accountSub.ServicePlan.Duration);
+                if (DateTime.Today <= EndDate)
+                {
+                    ViewData["isActif"] = true;
+                }
+                else
+                {
+                    ViewData["isActif"] = false;
+                }
+            }
+            else
+            {
+                ViewData["isActif"] = false;
+            }
+            
             if (account == null)
             {
                 return NotFound();
@@ -336,48 +415,47 @@ namespace MahataCrm.Controllers
                         throw;
                     }
                 }
+                Souscription subcribe = new Souscription();
+                subcribe.DateSouscription = DateTime.Now.Date;
+                subcribe.ServicePlanID = ServicePlanID;
+                subcribe.AccountID = account.Id;
+                _context.Add(subcribe);
             }
 
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            await _emailSender.SendEmailAsync("axeltsotie@gmail.com", "Assign service plan",
+                            $"Hello ,'{account.BusinessName}' , Your Have a new service plan");
+            return RedirectToAction("AssignSP", "Accounts", new { id = account.Id });
         }
-        public IActionResult Signature()
+
+        // GET: Accounts/search
+        public IActionResult searchIn()
         { 
-          return View();
+          return View("search");
         }
-            public async Task<IActionResult> UploadCertificate(SignatureModel signModel)
+
+        // POST: Accounts/search
+        public async Task<IActionResult> search(SearchAccountModel search)
         {
-
-            // Get the data submitted from the form
-            string distinguishedName = signModel.DistinguishedName;
-            string serialNumber = signModel.SerialNumber;
-            string signature = signModel.Signature;
-
-            // Reconstruct the data to verify the signature
-           // string dataToVerify = $"{distinguishedName}|{serialNumber}";
-
-            // Load the public key from the certificate to verify the signature
-           // X509Certificate2 certificate = new X509Certificate2(/* path to your server's public certificate */);
-           /* RSACryptoServiceProvider rsa = (RSACryptoServiceProvider)certificate.PublicKey.Key;
-
-            byte[] dataBytes = Encoding.UTF8.GetBytes(dataToVerify);
-            byte[] signatureBytes = Convert.FromBase64String(signature);
-
-            bool isValid = rsa.VerifyData(dataBytes, CryptoConfig.MapNameToOID("SHA256"), signatureBytes);*/
-
-
-
-           /* if (isValid)
+            List<Account> accounts = new List<Account>();
+            if (search.FromC != null && search.ToC != null)
             {
-                // Signature is valid, proceed with your logic
-                Console.WriteLine("Signature Verified: " + isValid);
+                accounts = _context.Accounts
+                        .Where(t => t.CreatedAt >= search.FromC && t.CreatedAt <= search.ToC)
+                        .ToList();
+                return View("Index", accounts);
             }
-            else
+            if (search.FromU != null && search.ToU != null)
             {
-                // Invalid signature, handle the error
-            }*/
-            return View();
+                accounts = _context.Accounts
+                        .Where(t =>  t.UpdatedAt >= search.FromU && t.UpdatedAt <= search.ToU)
+                        .ToList();
+                return View("Index", accounts);
+            }
+
+            return View("Index", accounts);
         }
+
 
         private bool AccountExists(int id)
         {

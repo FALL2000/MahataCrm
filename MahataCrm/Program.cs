@@ -1,8 +1,10 @@
 using MahataCrm.Data;
 using MahataCrm.Models;
+using MahataCrm.Service;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Quartz;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -45,6 +47,29 @@ builder.Services.AddAuthorization(options =>
         policy.RequireAuthenticatedUser();
     });
 });
+
+builder.Services.AddScoped<IEmailSender, EmailSender>();
+
+// Configure Quartz.NET
+builder.Services.AddQuartz(q =>
+{
+    q.UseMicrosoftDependencyInjectionJobFactory();
+
+    var jobKey = new JobKey("ServiceExpiryJob");
+    q.AddJob<ServiceExpiryJob>(opts => opts.WithIdentity(jobKey));
+
+    // Trigger every minute for testing
+    q.AddTrigger(opts => opts
+        .ForJob(jobKey)
+        .WithIdentity("ServiceExpiryJob-trigger")
+        .WithCronSchedule("0 17 * * *  ?"));
+
+
+    // Every 10 seconds during 18:00
+});
+
+// Add Quartz hosted service
+builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
 
 builder.Services.AddControllersWithViews();
 

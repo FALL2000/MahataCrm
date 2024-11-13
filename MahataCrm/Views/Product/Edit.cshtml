@@ -1,0 +1,46 @@
+﻿@model MahataCrm.Models.Product
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Product</h1>
+
+<h4>Edit Product</h4>
+<hr />
+<div class="container">
+    <form asp-action="Edit">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="AccountID" />
+                <div class="form-group row">
+                    <div class="col-sm-6">
+                        <label asp-for="Description" class="control-label">Description</label>
+                        <input asp-for="Description" class="form-control" />
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+                    <div class="col-sm-6">
+                        <label asp-for="Price" class="control-label">Price</label>
+                        <input asp-for="Price" class="form-control" />
+                        <span asp-validation-for="Price" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-sm-4"></div>
+                    <div class="col-sm-8">
+                        <input type="submit" value="Edit" class="btn btn-primary" />
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-sm-4"></div>
+                    <div class="col-sm-8">
+                        <a asp-action="Index">Back to List</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+

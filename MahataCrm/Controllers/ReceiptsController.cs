@@ -21,6 +21,19 @@ using iText.Layout.Properties;
 using iText.IO.Font.Constants;
 using iText.Kernel.Pdf.Canvas.Draw;
 using System.Reflection;
+using MahataCrm.Service;
+using Newtonsoft.Json.Linq;
+using Microsoft.ReportingServices.Interfaces;
+using CrmMahata.Models;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using iText.IO.Image;
+using System.Drawing;
+using Path = System.IO.Path;
+using System.Drawing.Imaging;
+using Images = iText.Layout.Element.Image;
+using Image = System.Drawing.Image;
+using QRCoder;
+using Org.BouncyCastle.Utilities;
 
 namespace MahataCrm.Controllers
 {
@@ -45,12 +58,12 @@ namespace MahataCrm.Controllers
             PageSize pageSize = PageSize.A6;
             if(numberOfElement == 1)
             {
-                pageSize.SetHeight(625);
+                pageSize.SetHeight(850);
             }
             else
             {
                 var addsize = (numberOfElement - 1) * 25;
-                pageSize.SetHeight(addsize + 625);
+                pageSize.SetHeight(addsize + 850);
             }
             
             Document document = new Document(pdf, pageSize);
@@ -70,9 +83,39 @@ namespace MahataCrm.Controllers
             return Paragraph;
         }
 
+        private string ResizeImage(string imagePath, int targetWidth, int targetHeight)
+        {
+            using (var image = Image.FromFile(imagePath))
+            {
+                var resizedImage = new Bitmap(targetWidth, targetHeight);
+                using (var graphics = Graphics.FromImage(resizedImage))
+                {
+                    graphics.DrawImage(image, 0, 0, targetWidth, targetHeight);
+                }
+
+                string resizedImagePath = Path.Combine(Path.GetDirectoryName(imagePath), $"resized_{Path.GetFileName(imagePath)}");
+                resizedImage.Save(resizedImagePath, ImageFormat.Jpeg);
+
+                return resizedImagePath;
+            }
+        }
+        static byte[] GenerateQrCode(string url)
+        {
+            QRCodeGenerator qrGenerator = new QRCodeGenerator();
+            QRCodeData qrCodeData = qrGenerator.CreateQrCode(url, QRCodeGenerator.ECCLevel.Q);
+            BitmapByteQRCode qrCode = new BitmapByteQRCode(qrCodeData);
+            return qrCode.GetGraphic(20);  // Ajustez la taille du QR code ici
+        }
+
         private void AddInvoiceContent(Document document, int id, Receipt receipt)
         {
-
+            string imagePath = $"{_webHostEnvironment.WebRootPath}\\Image\\tra.jpg";
+            string resizedImagePath = ResizeImage(imagePath, 80, 30);
+            Images logo = new Images(ImageDataFactory.Create(resizedImagePath));
+            logo.SetHorizontalAlignment(HorizontalAlignment.CENTER);
+            logo.SetMargins(10, 50, 10, 80);
+            logo.SetBackgroundColor(iText.Kernel.Colors.ColorConstants.WHITE);
+            document.Add(new Paragraph().Add(logo));
             // Entête de la facture
             PdfFont boldFont = PdfFontFactory.CreateFont(StandardFonts.HELVETICA_BOLD);
             Paragraph header = new Paragraph(receipt.Account.BusinessName)
@@ -94,7 +137,7 @@ namespace MahataCrm.Controllers
             document.Add(new Paragraph(" "));
 
             document.Add(paragrahElement("CUSTOMER NAME: ", receipt.CustName));
-            document.Add(paragrahElement("CUSTOMER ID TYPE: ", receipt.CustIdType));
+            document.Add(paragrahElement("CUSTOMER ID TYPE: ", receipt.CustIdType.ToString()));
             document.Add(paragrahElement("CUSTOMER ID: ", receipt.CustId));
             document.Add(paragrahElement("CUSTOMER MOBILE: ", receipt.CustNum.ToString()));
             document.Add(paragrahElement("RECEIPT NO: ", receipt.RctNum));
@@ -111,9 +154,15 @@ namespace MahataCrm.Controllers
             document.Add(separator);
 
             // Montant total
-            document.Add(paragrahElement("TOTAL EXCL OF TAX: ", receipt.TotalTaxExcl.ToString()));
-            document.Add(paragrahElement("TOTAL TAX: ", (receipt.TotalTaxIncl - receipt.TotalTaxExcl).ToString()));
-            document.Add(paragrahElement("TOTAL INCL OF TAX: ", receipt.TotalTaxIncl.ToString()));
+            document.Add(paragrahElement("TOTAL EXCL OF TAX: ", receipt.TotalTaxExcl?.ToString("#,##0.00", System.Globalization.CultureInfo.InvariantCulture)));
+            //document.Add(paragrahElement("TOTAL TAX: ", (receipt.TotalTaxIncl - receipt.TotalTaxExcl)?.ToString("#,##0.00", System.Globalization.CultureInfo.InvariantCulture)));
+            document.Add(paragrahElement("TOTAL INCL OF TAX: ", receipt.TotalTaxIncl?.ToString("#,##0.00", System.Globalization.CultureInfo.InvariantCulture)));
+            Images qrImage = new Images(ImageDataFactory.Create(GenerateQrCode(receipt.LinkVerification)));
+            qrImage.SetWidth(100);
+            qrImage.SetHeight(100);
+            qrImage.SetHorizontalAlignment(HorizontalAlignment.CENTER);
+            qrImage.SetMargins(10, 70, 10, 60);
+            document.Add(qrImage);
         }
 
         public async Task<ActionResult> DownloadInvoice(int id)
@@ -150,47 +199,6 @@ namespace MahataCrm.Controllers
             }
             return table;
         }
-
-
-        // GET: Receipts/PrintReceipt/5
-       /* public async Task<IActionResult> PrintReceipt(int id)
-        {
-            var receipt = await _context.Receipts
-                .Include(r => r.Account)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            var dt = new DataTable();
-            dt = GetItemList(id);
-            List<ReportParameter> parameters = new List<ReportParameter>();
-            parameters.Add(new ReportParameter("BName", receipt.Account.BusinessName));
-            parameters.Add(new ReportParameter("BPhone", receipt.Account.Phone.ToString()));
-            parameters.Add(new ReportParameter("Tin", receipt.Account.Tin.ToString()));
-            parameters.Add(new ReportParameter("Vrn", receipt.Account.Vrn));
-            parameters.Add(new ReportParameter("Serial", receipt.Account.Serial));
-            parameters.Add(new ReportParameter("Uin", receipt.Account.Uin));
-            parameters.Add(new ReportParameter("TaxOffice", receipt.Account.TaxOffice));
-            parameters.Add(new ReportParameter("CustName", receipt.CustName));
-            parameters.Add(new ReportParameter("CustIdType", receipt.CustIdType));
-            parameters.Add(new ReportParameter("CustId", receipt.CustId));
-            parameters.Add(new ReportParameter("CustNum", receipt.CustNum.ToString()));
-            parameters.Add(new ReportParameter("RctNum", receipt.RctNum));
-            parameters.Add(new ReportParameter("Znum", receipt.Znum));
-            parameters.Add(new ReportParameter("RctDate", receipt.RctDate.ToString()));
-            //parameters.Add(new ReportParameter("RctTime", receipt.RctTime.ToString()));
-            parameters.Add(new ReportParameter("TotalExclTax", receipt.TotalTaxExcl.ToString()));
-            parameters.Add(new ReportParameter("TotalTax", (receipt.TotalTaxIncl - receipt.TotalTaxExcl).ToString()));
-            parameters.Add(new ReportParameter("TotalInclTax",receipt.TotalTaxIncl.ToString()));
-
-            LocalReport localReport = new LocalReport();
-            localReport.ReportPath = $"{_webHostEnvironment.WebRootPath}\\Reports\\Receipts.rdlc";
-            //ReportDataSource reportDataSource = new ReportDataSource();
-            //reportDataSource.Name = "receiptDataSet";
-            //reportDataSource.Value = dt;
-            localReport.DataSources.Add(new ReportDataSource("Receipts",dt));
-            localReport.SetParameters(parameters);
-
-            var reportBytes = localReport.Render("PDF");
-            return File(reportBytes, "application/pdf", "Receipt.pdf");
-        }*/
 
 
 
@@ -251,21 +259,31 @@ namespace MahataCrm.Controllers
             return View();
         }
 
-        // POST: Receipts/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // POST: Receipts/CreateReceipt
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,RctNum,Znum,TotalTaxExcl,TotalTaxIncl,CustName,CustIdType,CustId,CustNum")] Receipt receipt)
+        public async Task<IActionResult> CreateReceipt([Bind("Id,RctNum,Znum,TotalTaxExcl,TotalTaxIncl,CustName,CustIdType,CustId,CustNum,PaymentType")] Receipt receipt, ICollection<ReceiptItem> ReceiptItems)
         {
             //if (ModelState.IsValid)
             //{
-               
+                foreach (var item in ReceiptItems)
+                {
+                    if (item.Tax == 1) { item.Tax = 0.18; }  
+                    _context.ReceiptItems.Add(item);
+                }
+                await _context.SaveChangesAsync();
+                var rcts = _context.Receipts.ToList();
+                int num = rcts.Count() + 1;
+                var customer = _context.Customers.FirstOrDefault(c => c.Id == int.Parse(receipt.CustName));
                 var CurrentUser = await _userManager.GetUserAsync(HttpContext.User);
                 var operatorMatch =  _context.OperatorMatchs.FirstOrDefault(r => r.OperatorID == CurrentUser.Id);
                 var Items = _context.ReceiptItems.Where(r => r.IsNew == true).ToList();
                 receipt.RctDate = DateTime.Now.Date;
                 receipt.RctTime = DateTime.Now.TimeOfDay;
+                receipt.CustName = customer.FirstName + ' ' + customer.LastName;
+                receipt.CustId = customer.CustId;
+                receipt.CustIdType = customer.CustIdType.ToString();
+                receipt.RctNum = num.ToString("D6");
+                receipt.isPost = false;
                 receipt.AccountID = operatorMatch.BussinessId;
                 using (var transaction = _context.Database.BeginTransaction())
                 {
@@ -290,7 +308,8 @@ namespace MahataCrm.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                string urlDetail = Url.Action("Details", "Receipts", new { id = receipt.Id });
+                return Json(new { url = urlDetail });
             //}
             //ViewData["AccountID"] = new SelectList(_context.Accounts, "Id", "Id", receipt.AccountID);
             //return View(receipt);
@@ -304,7 +323,7 @@ namespace MahataCrm.Controllers
                 return NotFound();
             }
 
-            var receipt = await _context.Receipts.FindAsync(id);
+            var receipt = await _context.Receipts.Include(r => r.ReceiptItems).FirstOrDefaultAsync(r => r.Id == id);
             if (receipt == null)
             {
                 return NotFound();
@@ -381,6 +400,128 @@ namespace MahataCrm.Controllers
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
+        }
+
+        public List<Customer> GetCustomers()
+        {
+            var customers = new List<Customer>();
+            customers = _context.Customers.ToList();
+            return customers;
+        }
+
+        public List<Product> GetProducts()
+        {
+            var products = new List<Product>();
+            products = _context.Products.ToList();
+            return products;
+        }
+
+        public async Task<ActionResult> PostReceipt(int id)
+        {
+
+            var tokenResponse = await APIService.GetAccessToken("demo", "rehema");
+            if (bool.Parse(tokenResponse["isError"]?.ToString()) == false)
+            {
+                var token = tokenResponse["accessToken"]?.ToString();
+                var receipt = await _context.Receipts
+                .Include(r => r.ReceiptItems)
+                .FirstOrDefaultAsync(m => m.Id == id);
+                var jsonResponse = await APIService.PostGenerateReceipt(token, receipt);
+                var zNum = jsonResponse["znum"]?.ToString();
+                var totalExclOfTax = jsonResponse["total_excl_of_tax"]?.ToString();
+                var totalTax = jsonResponse["total_tax"]?.ToString();
+                var totalInclOfTax = jsonResponse["total_incl_of_tax"]?.ToString();
+                var link = jsonResponse["link"]?.ToString();
+                receipt.Znum = zNum;
+                receipt.TotalTaxExcl = double.Parse(totalExclOfTax);
+                receipt.TotalTaxIncl = double.Parse(totalInclOfTax);
+                receipt.TotalTax = double.Parse(totalTax);
+                receipt.LinkVerification = link;
+                receipt.isPost = true;
+                _context.Update(receipt);
+                await _context.SaveChangesAsync();
+                return RedirectToAction("Details", "Receipts", new { id = id });
+            }
+            return RedirectToAction("Details", "Receipts", new { id = id });
+        }
+
+        public async Task<ActionResult> Zreport()
+        {
+            try
+            {
+                var tokenResponse = await APIService.GetAccessToken("demo", "rehema");
+                if (bool.Parse(tokenResponse["isError"]?.ToString()) == false)
+                {
+                    var token = tokenResponse["accessToken"]?.ToString();
+                    var jsonResponse = await APIService.GetZReports(token);
+                    List<ZreportViewModel> zreports = new List<ZreportViewModel>();
+                    if (jsonResponse["isError"] == null)
+                    {
+                        var zreportsResponse = jsonResponse["zreport"]?.ToArray();
+                        foreach (var report in zreportsResponse)
+                        {
+                            string subtotalstr = report["subtotal"]?.ToString().Substring(0, (int)report["subtotal"]?.ToString().IndexOf("."));
+                            string totalstr = report["total"]?.ToString().Substring(0, (int)report["total"]?.ToString().IndexOf("."));
+                            string totalGrossStr = report["total_gross"]?.ToString().Substring(0, (int)report["total_gross"]?.ToString().IndexOf("."));
+                            var subtotal = double.Parse(subtotalstr);
+                            var total = double.Parse(totalstr);
+                            var totalGross = double.Parse(totalGrossStr);
+                            var Zreport = new ZreportViewModel();
+                            Zreport.ReportNumber = report["report_number"]?.ToString();
+                            Zreport.ReportDate = report["report_date"]?.ToString();
+                            Zreport.ReportTime = report["report_time"]?.ToString();
+                            Zreport.SubTotal = subtotal.ToString("#,##0.00", System.Globalization.CultureInfo.InvariantCulture); //report["subtotal"]?.ToString(); 
+                            Zreport.Discount = report["discount"]?.ToString();
+                            Zreport.Total = total.ToString("#,##0.00", System.Globalization.CultureInfo.InvariantCulture); // report["total"]?.ToString();
+                            Zreport.Vat = report["vat"]?.ToString();
+                            Zreport.TotalGross = totalGross.ToString("#,##0.00", System.Globalization.CultureInfo.InvariantCulture);//  report["total_gross"]?.ToString();
+                            zreports.Add(Zreport);
+                        }
+                        ViewBag.isError = false;
+                        return View(zreports);
+                    }
+                    else
+                    {
+                        ViewBag.isError = true;
+                        ViewBag.ErrorStatus = jsonResponse["ErrorStatus"];
+                        ViewBag.Error = jsonResponse["Error"];
+                        return View();
+                    }
+                }
+                else
+                {
+                    ViewBag.isError = true;
+                    ViewBag.ErrorStatus = tokenResponse["ErrorStatus"];
+                    ViewBag.Error = tokenResponse["Error"];
+                    return View();
+                }
+            }catch(HttpRequestException ex)
+            {
+                ViewBag.isError = true;
+                ViewBag.Error = "Connection Error, we were unable to connect";
+                return View();
+            }
+        }
+
+        public IActionResult search()
+        {
+            return View();
+        }
+
+        public async Task<IActionResult> searchReceipt(SearchAccountModel search)
+        {
+            var CurrentUser = await _userManager.GetUserAsync(HttpContext.User);
+            var operatorMatch = _context.OperatorMatchs.FirstOrDefault(r => r.OperatorID == CurrentUser.Id);
+            List<Receipt> receipts = new List<Receipt>();
+            if (search.FromC != null && search.ToC != null)
+            {
+                receipts = _context.Receipts
+                        .Where(t => t.RctDate >= search.FromC && t.RctDate <= search.ToC && t.AccountID == operatorMatch.BussinessId)
+                        .ToList();
+                return View("Index", receipts);
+            }
+
+            return View("Index", receipts);
         }
 
         private bool ReceiptExists(int id)

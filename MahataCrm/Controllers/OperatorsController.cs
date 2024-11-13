@@ -1,12 +1,16 @@
 ﻿using CrmMahata.Models;
 using MahataCrm.Data;
 using MahataCrm.Models;
+using MahataCrm.Service;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.View;
+using System.Diagnostics;
 
 namespace MahataCrm.Controllers
 {
@@ -16,12 +20,16 @@ namespace MahataCrm.Controllers
         private readonly UserManager<Operator> _userManager;
         private readonly SignInManager<Operator> _signInManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly ApplicationDbContext _context;
+        private readonly IEmailSender _emailSender;
 
-        public OperatorsController(UserManager<Operator> userManager, RoleManager<IdentityRole> roleManager, SignInManager<Operator> signInManager)
+        public OperatorsController(UserManager<Operator> userManager, RoleManager<IdentityRole> roleManager, SignInManager<Operator> signInManager, ApplicationDbContext context, IEmailSender emailSender)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _signInManager = signInManager;
+            _context = context;
+            _emailSender = emailSender;
         }
 
 
@@ -117,6 +125,51 @@ namespace MahataCrm.Controllers
             return View();
         }
 
+        private string CreateMessage(string code)
+        {
+            string cssStyles = @"
+            <style>
+                body {
+                    font-family: Arial, sans-serif;
+                    background-color: #f4f4f4;
+                    color: #333;
+                }
+                .container {
+                    max-width: 600px;
+                    margin: 0 auto;
+                    padding: 20px;
+                    background: #fff;
+                    border-radius: 5px;
+                    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+                }
+                h1 {
+                    color: #007bff;
+                }
+            </style>";
+            return $@"
+                <!DOCTYPE html>
+                <html lang='en'>
+                <head>
+                    <meta charset='UTF-8'>
+                    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+                    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+                    <title>Verifying your email address</title>
+                    {cssStyles}
+                </head>
+                <body>
+                    <div class='container'>
+                        <h1>Verifying your email address</h1>
+                        <p>Hello,</p>
+                        <p>Thank you for registering on our platform. To confirm your email address, please enter the following verification code:</p>
+                        <h2 style='background-color: #007bff; color: #fff; padding: 10px; border-radius: 5px;'>{code}</h2>
+                        <p>This verification code will expire in 30 minutes.</p>
+                        <p>If you have not created an account on our platform, please ignore this email.</p>
+                        <p>Thank you,<br>Mahita CRM</p>
+                    </div>
+                </body>
+                </html>";
+        }
+
         [AllowAnonymous]
         // GET: OperatorsController/Login
         public ActionResult Login()
@@ -132,18 +185,102 @@ namespace MahataCrm.Controllers
         {
             if (ModelState.IsValid)
             {
-                var result = await _signInManager.PasswordSignInAsync(Logvm.Email, Logvm.Password, false, false);
-                if (result.Succeeded)
+                //var result = await _signInManager.PasswordSignInAsync(Logvm.Email, Logvm.Password, false, false);
+                var user = await _userManager.FindByEmailAsync(Logvm.Email);
+                if (user != null)
                 {
-                    return RedirectToAction("Index", "Home");
+                    bool isvalid = await _userManager.CheckPasswordAsync(user, Logvm.Password);
+                    if (isvalid)
+                    {
+                        Opt opt = new Opt
+                        {
+                            userId = user.Id,
+                            createdAt = DateTime.Now,
+                            optMail = Logvm.Email,
+                            optPass = Logvm.Password,
+                            otp = GenerateOtpCode()
+                        };
+
+                        _context.Add(opt);
+                        await _context.SaveChangesAsync();
+                        try
+                        {
+                            await _emailSender.SendEmailAsync("axeltsotie@gmail.com", "Verification Code",
+                            CreateMessage(opt.otp));
+                            opt.otp = "";
+                        }
+                        catch
+                        {
+                            ModelState.AddModelError(string.Empty, "An SMTP error occurred while sending the verification code, Please check your internet connection");
+                            return View();
+                        }
+                        
+                        return View("Verif", opt);
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, "Invalid Email or Password");
+                    }
+                }
+
+                /*if (result.Succeeded)
+                {
+                    var currentUser = await _userManager.GetUserAsync(HttpContext.User);
+
+                    if (currentUser != null)
+                    {
+                       
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, "User not found");
+                    }
                 }
                 else
                 {
                     ModelState.AddModelError(string.Empty, "Invalid Email or Password");
-                }
+                }*/
             }
 
             return View();
+        }
+
+        [AllowAnonymous]
+        // POST: OperatorsController/Verify
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Verif(Opt opt)
+        {
+            Opt op = _context.Opts.Where(o => o.userId == opt.userId && o.otp == opt.otp).FirstOrDefault();
+            if (op == null)
+            {
+                ModelState.AddModelError(string.Empty, "Invalid verification code");
+            }
+            else
+            {
+                if (DateTime.Now > op.createdAt.AddMinutes(30))
+                {
+                    ModelState.AddModelError(string.Empty, "Verification code has expired. Please log in again");
+                    return View();
+                }
+                else
+                {
+                    var result = await _signInManager.PasswordSignInAsync(op.optMail, op.optPass, false, false);
+                    if (result.Succeeded)
+                    {
+                        _context.Opts.Remove(op);
+                        return RedirectToAction("Index", "Home");
+                    }
+                }
+            }
+            return View();
+        }
+
+        private string GenerateOtpCode()
+        {
+            // Générer un code OTP aléatoire
+            Random rand = new Random();
+            return rand.Next(1000, 9999).ToString();
         }
 
         // GET: OperatorsController/Logout
@@ -211,6 +348,25 @@ namespace MahataCrm.Controllers
             }
             
             return View(Opvm);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> changePassword(string oldPassword, string newPassword)
+        {
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            var changePasswordResult = await _userManager.ChangePasswordAsync(user, oldPassword, newPassword);
+            if (!changePasswordResult.Succeeded)
+            {
+                return Json(new { error = true, message = "Erron an Occured, please try again" });
+            }
+            user.HaveConnexion = true;
+            var result = await _userManager.UpdateAsync(user);
+            if (!result.Succeeded)
+            {
+                return Json(new { error = true, message = "Erron an Occured, please try again" });
+            }
+            string urlDetail = Url.Action("Index", "Home");
+            return Json(new { error = false, url = urlDetail });
         }
 
         [Authorize(Roles = "Super Admin")]

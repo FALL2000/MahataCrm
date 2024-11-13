@@ -1,67 +1,325 @@
-﻿@{
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<Operator> SignInManager
+@inject UserManager<Operator> UserManager
+@{
     ViewData["Title"] = "Home Page";
 }
 
-<h3>Dashboard</h3>
+<style>
+    /* Personnalisation du spinner */
+    .spinner-container {
+        display: none; /* Cacher par défaut */
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5); /* Fond semi-transparent */
+        z-index: 9999; /* Empilement au-dessus de tout */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+</style>
 
+<div class="spinner-container">
+    <div class="spinner-border text-primary" role="status">
+        <span class="sr-only">Load...</span>
+    </div>
+</div>
+@if (ViewBag.haveConnexion == false)
+{
+    <div id="changePasswordMessage"></div>
+    <div class="modal fade show" id="myModal" data-backdrop="static" data-keyboard="false" tabindex="-1"
+         aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Change Your Password</h5>
+                </div>
+                <div class="modal-body">
+                    <span class="text-danger" id="error"></span>
+                    <input type="password" id="passold" class="form-control" placeholder="Old Password"><br />
+                    <input type="password" id="passnew" class="form-control" placeholder="New Password"><br />
+                    <input type="password" id="passcon" class="form-control" placeholder="Confirm New Password">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="saveBtn">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<h3>Dashboard</h3>
+<hr />
 <div class="row">
+    @if (User.IsInRole("Bussiness"))
+    {
+        @if(ViewBag.isConError == true)
+        {
+            <p><h4>@ViewBag.Error</h4></p>
+        }
+        else
+        {
+            @if (ViewBag.isError == true)
+            {
+                <p><h4>@ViewBag.Error</h4></p>
+            }
+            else
+            {
+                @if (ViewBag.isNone == false)
+                {
+                    <!-- Earnings (Monthly) Card Example -->
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-primary shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Receipt Post Today</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">@ViewBag.totalRct</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa -calendar fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Earnings (Monthly) Card Example -->
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-success shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Total Amount Today</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">@ViewBag.totalAmount</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pending Requests Card Example -->
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-warning shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Total Month Amount</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">@ViewBag.totalMonthAmount</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-comments fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <!-- Earnings (Monthly) Card Example -->
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-primary shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Receipt Post Today</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">0</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Earnings (Monthly) Card Example -->
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-success shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Total Amount Today</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">0</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pending Requests Card Example -->
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-warning shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Total Month Amount</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">0</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-comments fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+
+            <!-- Area Chart -->
+            <div class="col-xl-12 col-lg-12">
+                <div class="card shadow mb-4">
+                    <!-- Card Header - Dropdown -->
+                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                        <h6 class="m-0 font-weight-bold text-primary">Number receipt post per month current year</h6>
+                    </div>
+                    <!-- Card Body -->
+                    <div class="card-body">
+                        <div class="chart-area">
+                            <canvas id="amountPerMonth"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        }
+    }
+    else
+    {
+        <!-- Pie Chart -->
+        <div class="col-xl-6 col-lg-6">
+            <div class="card shadow mb-4">
+                <!-- Card Header - Dropdown -->
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Business Account Stats</h6>
+                </div>
+                <!-- Card Body -->
+                <div class="card-body">
+                    <div class="chart-pie pt-4 pb-2">
+                        <div class="chartjs-size-monitor"><div class="chartjs-size-monitor-expand"><div class=""></div></div><div class="chartjs-size-monitor-shrink"><div class=""></div></div></div>
+                        <canvas id="AccountChart" width="327" height="306" style="display: block; height: 245px; width: 262px;" class="chartjs-render-monitor"></canvas>
+                    </div>
+                    <div class="mt-4 text-center small">
+                        <span class="mr-2">
+                            <i class="fas fa-circle text-primary"></i> Active
+                        </span>
+                        <span class="mr-2">
+                            <i class="fas fa-circle text-success"></i> Inactive
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-6 col-lg-6">
+            <div class="card shadow mb-4">
+                <!-- Card Header - Dropdown -->
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Operator Stats</h6>
+                </div>
+                <!-- Card Body -->
+                <div class="card-body">
+                    <div class="chart-pie pt-4 pb-2">
+                        <div class="chartjs-size-monitor"><div class="chartjs-size-monitor-expand"><div class=""></div></div><div class="chartjs-size-monitor-shrink"><div class=""></div></div></div>
+                        <canvas id="OperatorChart" width="327" height="306" style="display: block; height: 245px; width: 262px;" class="chartjs-render-monitor"></canvas>
+                    </div>
+                    <div class="mt-4 text-center small">
+                        <span class="mr-2">
+                            <i class="fas fa-circle text-primary"></i> Super Admin
+                        </span>
+                        <span class="mr-2">
+                            <i class="fas fa-circle text-success"></i> Admin
+                        </span>
+                        <span class="mr-2">
+                            <i class="fas fa-circle text-info"></i> Auditor
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
 
     
-
-    <!-- Pie Chart -->
-    <div class="col-xl-6 col-lg-6">
-        <div class="card shadow mb-4">
-            <!-- Card Header - Dropdown -->
-            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <h6 class="m-0 font-weight-bold text-primary">Business Account Stats</h6>
-            </div>
-            <!-- Card Body -->
-            <div class="card-body">
-                <div class="chart-pie pt-4 pb-2">
-                    <div class="chartjs-size-monitor"><div class="chartjs-size-monitor-expand"><div class=""></div></div><div class="chartjs-size-monitor-shrink"><div class=""></div></div></div>
-                    <canvas id="AccountChart" width="327" height="306" style="display: block; height: 245px; width: 262px;" class="chartjs-render-monitor"></canvas>
-                </div>
-                <div class="mt-4 text-center small">
-                    <span class="mr-2">
-                        <i class="fas fa-circle text-primary"></i> Active
-                    </span>
-                    <span class="mr-2">
-                        <i class="fas fa-circle text-success"></i> Inactive
-                    </span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-xl-6 col-lg-6">
-        <div class="card shadow mb-4">
-            <!-- Card Header - Dropdown -->
-            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <h6 class="m-0 font-weight-bold text-primary">Operator Stats</h6>
-            </div>
-            <!-- Card Body -->
-            <div class="card-body">
-                <div class="chart-pie pt-4 pb-2">
-                    <div class="chartjs-size-monitor"><div class="chartjs-size-monitor-expand"><div class=""></div></div><div class="chartjs-size-monitor-shrink"><div class=""></div></div></div>
-                    <canvas id="OperatorChart" width="327" height="306" style="display: block; height: 245px; width: 262px;" class="chartjs-render-monitor"></canvas>
-                </div>
-                <div class="mt-4 text-center small">
-                    <span class="mr-2">
-                        <i class="fas fa-circle text-primary"></i> Super Admin
-                    </span>
-                    <span class="mr-2">
-                        <i class="fas fa-circle text-success"></i> Admin
-                    </span>
-                    <span class="mr-2">
-                        <i class="fas fa-circle text-info"></i> Auditor
-                    </span>
-                </div>
-            </div>
-        </div>
-    </div>
 </div>
 @section Scripts {
     <script>
+        $(document).ready(function () {
+            $('#myModal').modal('show');
+            $('#saveBtn').click(function () {
+                var regex = /^.{8,12}$/;
+                var majusculeRegex = /[A-Z]/;
+                var specialCharRegex = /[!#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/;
+                var oldPass = $('#passold').val();
+                var newPass = $('#passnew').val();
+                var confirmPass = $('#passcon').val();
+                if (oldPass.trim() === '' || newPass.trim() === '' || confirmPass.trim() === '') {
+                    $('#error').text('');
+                    $('#error').text('All fields are required');
+                } else {
+                    if (!regex.test(newPass)) {
+                        $('#error').text('');
+                        $('#error').text('Password between 8-12');
+                    } else {
+                        if (!majusculeRegex.test(newPass)) {
+                            $('#error').text('');
+                            $('#error').text('Password one capital letter');
+                        } else {
+                            if (!specialCharRegex.test(newPass)) {
+                                $('#error').text('');
+                                $('#error').text('Password one non alpha numeric');
+                            } else {
+                                if (newPass.trim() === confirmPass.trim()) {
+                                    $.ajax({
+                                        url: '@Url.Action("changePassword", "Operators")',
+                                        type: 'POST',
+                                        data: { oldPassword: oldPass.trim(), newPassword: newPass.trim() },
+                                        success: function (response) {
+                                            console.log(response);
+                                            if (response.error) {
+                                                $('#error').text(response.message);
+                                            } else {
+                                                $('#myModal').modal('hide');
+                                                $('#changePasswordMessage').html('<div class="alert alert-success" role="alert">Password successfully Change</div>');
+                                                //window.location.href = response.url;
+                                            }
+                                        },
+                                        error: function (xhr, status, error) {
+                                            console.log(error);
+                                        }
+                                    });
+                                } else {
+                                    $('#error').text('');
+                                    $('#error').text('The confirm pass not match');
+                                }
+                            }
+                        }
+                    }
+                }
+                
+
+            });
+        });
+        // Afficher le spinner lorsque le chargement de la page commence
+        window.addEventListener("load", function () {
+            document.querySelector(".spinner-container").style.display = "none";
+        });
+
+        // Cacher le spinner avant de quitter la page
+        window.addEventListener("beforeunload", function () {
+            document.querySelector(".spinner-container").style.display = "flex";
+        });
+
         Chart.defaults.global.defaultFontFamily = 'Nunito', '-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif';
         Chart.defaults.global.defaultFontColor = '#858796';
 
@@ -69,6 +327,8 @@
         console.log(accounts);
         var operators = @Html.Raw(Json.Serialize(ViewData["Operator"]));
         console.log(operators);
+        var receipts = @Html.Raw(Json.Serialize(ViewData["Receipts"]));
+        console.log(receipts);
         var labelsAccount = [];
         var labelsOperator = [];
         var dataAccount = [];
@@ -77,106 +337,241 @@
         var bgColorsOperator = [];
         var bghColorsAccount = [];
         var bghColorsOperator = [];
+        var monthsHaveReceipts = [];
+        var dataReceipt = [];
 
+        if (accounts) {
+            accounts.forEach(account => {
+                if (account.status == 0) {
+                    labelsAccount.push("Active");
+                    dataAccount.push(account.count);
+                    bgColorsAccount.push('#4e73df');
+                    bghColorsAccount.push('#2e59d9');
+                }
+                if (account.status == 1) {
+                    labelsAccount.push("Inactive");
+                    dataAccount.push(account.count);
+                    bgColorsAccount.push('#1cc88a');
+                    bghColorsAccount.push('#17a673');
+                }
+            });
 
-        accounts.forEach(account => {
-            if (account.status == 0) {
-                labelsAccount.push("Active");
-                dataAccount.push(account.count);
-                bgColorsAccount.push('#4e73df');
-                bghColorsAccount.push('#2e59d9');
-            }
-            if (account.status == 1) {
-                labelsAccount.push("Inactive");
-                dataAccount.push(account.count);
-                bgColorsAccount.push('#1cc88a');
-                bghColorsAccount.push('#17a673');
-            }
-        });
-
-        operators.forEach(operator => {
-            if (operator.typeOperator == "Super Admin") {
-                labelsOperator.push("Super Admin");
-                dataOperator.push(operator.count);
-                bgColorsOperator.push('#4e73df');
-                bghColorsAccount.push('#2e59d9');
-            }
-            if (operator.typeOperator == "Admin") {
-                labelsOperator.push("Admin");
-                dataOperator.push(operator.count);
-                bgColorsOperator.push('#1cc88a');
-                bghColorsOperator.push('#17a673');
-            }
-            if (operator.typeOperator == "Auditor") {
-                labelsOperator.push("Auditor");
-                dataOperator.push(operator.count);
-                bgColorsOperator.push('#36b9cc');
-                bghColorsOperator.push('#2c9faf');
-            }
-        });
-        
-
-        // Pie Chart Example
-        var accountChart = document.getElementById("AccountChart");
-        var operatorChart = document.getElementById("OperatorChart");
-        var accountPieChart = new Chart(accountChart, {
-            type: 'doughnut',
-            data: {
-                labels: labelsAccount,
-                datasets: [{
-                    data: dataAccount,
-                    backgroundColor: bgColorsAccount,
-                    hoverBackgroundColor: bghColorsAccount,
-                    hoverBorderColor: "rgba(234, 236, 244, 1)",
-                }],
-            },
-            options: {
-                maintainAspectRatio: false,
-                tooltips: {
-                    backgroundColor: "rgb(255,255,255)",
-                    bodyFontColor: "#858796",
-                    borderColor: '#dddfeb',
-                    borderWidth: 1,
-                    xPadding: 15,
-                    yPadding: 15,
-                    displayColors: false,
-                    caretPadding: 10,
+            // Pie Chart Example
+            var accountChart = document.getElementById("AccountChart");
+            var accountPieChart = new Chart(accountChart, {
+                type: 'doughnut',
+                data: {
+                    labels: labelsAccount,
+                    datasets: [{
+                        data: dataAccount,
+                        backgroundColor: bgColorsAccount,
+                        hoverBackgroundColor: bghColorsAccount,
+                        hoverBorderColor: "rgba(234, 236, 244, 1)",
+                    }],
                 },
-                legend: {
-                    display: false
+                options: {
+                    maintainAspectRatio: false,
+                    tooltips: {
+                        backgroundColor: "rgb(255,255,255)",
+                        bodyFontColor: "#858796",
+                        borderColor: '#dddfeb',
+                        borderWidth: 1,
+                        xPadding: 15,
+                        yPadding: 15,
+                        displayColors: false,
+                        caretPadding: 10,
+                    },
+                    legend: {
+                        display: false
+                    },
+                    cutoutPercentage: 80,
                 },
-                cutoutPercentage: 80,
-            },
-        });
+            });
+        }
 
-        var operatorPieChart = new Chart(operatorChart, {
-            type: 'doughnut',
-            data: {
-                labels: labelsOperator,
-                datasets: [{
-                    data: dataOperator,
-                    backgroundColor: bgColorsOperator,
-                    hoverBackgroundColor: bghColorsOperator,
-                    hoverBorderColor: "rgba(234, 236, 244, 1)",
-                }],
-            },
-            options: {
-                maintainAspectRatio: false,
-                tooltips: {
-                    backgroundColor: "rgb(255,255,255)",
-                    bodyFontColor: "#858796",
-                    borderColor: '#dddfeb',
-                    borderWidth: 1,
-                    xPadding: 15,
-                    yPadding: 15,
-                    displayColors: false,
-                    caretPadding: 10,
+        if (operators) {
+            operators.forEach(operator => {
+                if (operator.typeOperator == "Super Admin") {
+                    labelsOperator.push("Super Admin");
+                    dataOperator.push(operator.count);
+                    bgColorsOperator.push('#4e73df');
+                    bghColorsAccount.push('#2e59d9');
+                }
+                if (operator.typeOperator == "Admin") {
+                    labelsOperator.push("Admin");
+                    dataOperator.push(operator.count);
+                    bgColorsOperator.push('#1cc88a');
+                    bghColorsOperator.push('#17a673');
+                }
+                if (operator.typeOperator == "Auditor") {
+                    labelsOperator.push("Auditor");
+                    dataOperator.push(operator.count);
+                    bgColorsOperator.push('#36b9cc');
+                    bghColorsOperator.push('#2c9faf');
+                }
+            });
+
+            var operatorChart = document.getElementById("OperatorChart");
+            var operatorPieChart = new Chart(operatorChart, {
+                type: 'doughnut',
+                data: {
+                    labels: labelsOperator,
+                    datasets: [{
+                        data: dataOperator,
+                        backgroundColor: bgColorsOperator,
+                        hoverBackgroundColor: bghColorsOperator,
+                        hoverBorderColor: "rgba(234, 236, 244, 1)",
+                    }],
                 },
-                legend: {
-                    display: false
+                options: {
+                    maintainAspectRatio: false,
+                    tooltips: {
+                        backgroundColor: "rgb(255,255,255)",
+                        bodyFontColor: "#858796",
+                        borderColor: '#dddfeb',
+                        borderWidth: 1,
+                        xPadding: 15,
+                        yPadding: 15,
+                        displayColors: false,
+                        caretPadding: 10,
+                    },
+                    legend: {
+                        display: false
+                    },
+                    cutoutPercentage: 80,
                 },
-                cutoutPercentage: 80,
-            },
-        });
+            });
+        } 
+
+        if (receipts) {
+            receipts.forEach(receipt => {
+                monthsHaveReceipts.push(receipt.month);
+            });
+            console.log(monthsHaveReceipts);
+            for (i = 1; i <= 12; i++) {
+                if (monthsHaveReceipts.includes(i)) {
+                    const receipt = receipts.find((m) => m.month == i);
+                    dataReceipt.push(receipt.receiptNumber);
+                } else {
+                    dataReceipt.push(0);
+                }
+            }
+            console.log(dataReceipt);
+
+            function number_format(number, decimals, dec_point, thousands_sep) {
+                // *     example: number_format(1234.56, 2, ',', ' ');
+                // *     return: '1 234,56'
+                number = (number + '').replace(',', '').replace(' ', '');
+                var n = !isFinite(+number) ? 0 : +number,
+                    prec = !isFinite(+decimals) ? 0 : Math.abs(decimals),
+                    sep = (typeof thousands_sep === 'undefined') ? ',' : thousands_sep,
+                    dec = (typeof dec_point === 'undefined') ? '.' : dec_point,
+                    s = '',
+                    toFixedFix = function (n, prec) {
+                        var k = Math.pow(10, prec);
+                        return '' + Math.round(n * k) / k;
+                    };
+                // Fix for IE parseFloat(0.55).toFixed(0) = 0;
+                s = (prec ? toFixedFix(n, prec) : '' + Math.round(n)).split('.');
+                if (s[0].length > 3) {
+                    s[0] = s[0].replace(/\B(?=(?:\d{3})+(?!\d))/g, sep);
+                }
+                if ((s[1] || '').length < prec) {
+                    s[1] = s[1] || '';
+                    s[1] += new Array(prec - s[1].length + 1).join('0');
+                }
+                return s.join(dec);
+            }
+
+            // Area Chart Example
+            var ctx = document.getElementById("amountPerMonth");
+            var myLineChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+                    datasets: [{
+                        label: "Earnings",
+                        lineTension: 0.3,
+                        backgroundColor: "rgba(78, 115, 223, 0.05)",
+                        borderColor: "rgba(78, 115, 223, 1)",
+                        pointRadius: 3,
+                        pointBackgroundColor: "rgba(78, 115, 223, 1)",
+                        pointBorderColor: "rgba(78, 115, 223, 1)",
+                        pointHoverRadius: 3,
+                        pointHoverBackgroundColor: "rgba(78, 115, 223, 1)",
+                        pointHoverBorderColor: "rgba(78, 115, 223, 1)",
+                        pointHitRadius: 10,
+                        pointBorderWidth: 2,
+                        data: dataReceipt,
+                    }],
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    layout: {
+                        padding: {
+                            left: 10,
+                            right: 25,
+                            top: 25,
+                            bottom: 0
+                        }
+                    },
+                    scales: {
+                        xAxes: [{
+                            time: {
+                                unit: 'date'
+                            },
+                            gridLines: {
+                                display: false,
+                                drawBorder: false
+                            },
+                            ticks: {
+                                maxTicksLimit: 7
+                            }
+                        }],
+                        yAxes: [{
+                            ticks: {
+                                maxTicksLimit: 5,
+                                padding: 10,
+                                // Include a dollar sign in the ticks
+                                callback: function (value, index, values) {
+                                    return '' + number_format(value);
+                                }
+                            },
+                            gridLines: {
+                                color: "rgb(234, 236, 244)",
+                                zeroLineColor: "rgb(234, 236, 244)",
+                                drawBorder: false,
+                                borderDash: [2],
+                                zeroLineBorderDash: [2]
+                            }
+                        }],
+                    },
+                    legend: {
+                        display: false
+                    },
+                    tooltips: {
+                        backgroundColor: "rgb(255,255,255)",
+                        bodyFontColor: "#858796",
+                        titleMarginBottom: 10,
+                        titleFontColor: '#6e707e',
+                        titleFontSize: 14,
+                        borderColor: '#dddfeb',
+                        borderWidth: 1,
+                        xPadding: 15,
+                        yPadding: 15,
+                        displayColors: false,
+                        intersect: false,
+                        mode: 'index',
+                        caretPadding: 10,
+                        callbacks: {
+                            label: function (tooltipItem, chart) {
+                                var datasetLabel = chart.datasets[tooltipItem.datasetIndex].label || '';
+                                return datasetLabel + ': $' + number_format(tooltipItem.yLabel);
+                            }
+                        }
+                    }
+                }
+            });
+        }
     </script>
  }

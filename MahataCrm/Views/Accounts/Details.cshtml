@@ -2,6 +2,17 @@
 
 @{
     ViewData["Title"] = "Details";
+    var successMessage = TempData["SuccessMessage"] as string;
+}
+
+@if (!string.IsNullOrEmpty(successMessage))
+{
+    <div class="alert alert-success alert-dismissible">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        @successMessage
+    </div>
 }
 
 <h1>Details</h1>
@@ -27,7 +38,7 @@
                     Bussinness Name:
                 </dt>
                 <dd class="col-sm-8">
-                    @Html.DisplayFor(model => model.BusinessName)
+                    @Model.BusinessName.ToUpper()
                 </dd>
                 <dt class="col-sm-4">
                     Address:
@@ -46,12 +57,6 @@
                 </dt>
                 <dd class="col-sm-8">
                     @Html.DisplayFor(model => model.RegId)
-                </dd>
-                <dt class="col-sm-4">
-                    City:
-                </dt>
-                <dd class="col-sm-8">
-                    @Html.DisplayFor(model => model.City)
                 </dd>
             </dl>
         </div>
@@ -94,18 +99,49 @@
                     @Html.DisplayFor(model => model.Serial)
                 </dd>
                 <dt class="col-sm-4">
-                    Country:
-                </dt>
-                <dd class="col-sm-8">
-                    @Html.DisplayFor(model => model.Country)
-                </dd>
-                <dt class="col-sm-4">
-                    GC:
-                </dt>
-                <dd class="col-sm-8">
-                    @Html.DisplayFor(model => model.Gc)
-                </dd>
             </dl>
+        </div>
+    </div>
+</div>
+<div class="card shadow mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h6 class="m-0 font-weight-bold text-primary">subscription history</h6>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>
+                            Start Date
+                        </th>
+                        <th>
+                            End Date
+                        </th>
+                        <th>
+                            Service Plan
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in ViewData["souscriptions"] as List<Souscription>)
+                    {
+                        var endDate = item.DateSouscription.AddDays(item.ServicePlan.Duration);
+                        <tr>
+                            <td>
+                                @item.DateSouscription
+                            </td>
+                            <td>
+                                @endDate
+                            </td>
+                            <td>
+                                @item.ServicePlan.Name
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+
+            </table>
         </div>
     </div>
 </div>

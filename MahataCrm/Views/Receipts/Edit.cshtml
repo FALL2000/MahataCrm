@@ -1,81 +1,217 @@
-﻿@model MahataCrm.Models.Receipt
+﻿@using System.Reflection
+@model MahataCrm.Models.Receipt
 
 @{
     ViewData["Title"] = "Edit";
 }
 
-<h1>Edit</h1>
+@functions {
+    public static string GetEnumDisplayName(Enum value)
+    {
+        FieldInfo field = value.GetType().GetField(value.ToString());
+        EnumDisplayNameAttribute attribute = field.GetCustomAttribute<EnumDisplayNameAttribute>();
+        return attribute != null ? attribute.DisplayName : value.ToString();
+    }
+}
 
-<h4>Receipt</h4>
+<h1>Receipts</h1>
+
+<h4>Edit Receipt</h4>
 <hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" />
-            <div class="form-group">
-                <label asp-for="RctNum" class="control-label"></label>
-                <input asp-for="RctNum" class="form-control" />
-                <span asp-validation-for="RctNum" class="text-danger"></span>
+<p>
+    <a class="btn btn-primary" asp-action="Create" asp-controller="Product">Add Product</a>|
+    <a class="btn btn-primary" asp-action="Create" asp-controller="Customer">Add Customer</a>
+</p>
+<div class="container">
+    <form method="post">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group row">
+                    <div class="col-sm-6">
+                        <label asp-for="PaymentType" class="control-label">Payment Type</label>
+                        <select asp-for="PaymentType" class="form-control" id="payType">
+                            @foreach (var value in Enum.GetValues(typeof(PaymentType)))
+                            {
+                                <option value="@value">@GetEnumDisplayName((PaymentType)value)</option>
+                            }
+                        </select>
+                        <span asp-validation-for="PaymentType" class="text-danger"></span>
+                    </div>
+                    <div class="col-sm-6">
+                        <label asp-for="CustName" class="control-label">Customer Name</label>
+                        <select asp-for="CustName" id="custName" class="form-control"></select>
+                        <span asp-validation-for="CustName" class="text-danger"></span>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="Znum" class="control-label"></label>
-                <input asp-for="Znum" class="form-control" />
-                <span asp-validation-for="Znum" class="text-danger"></span>
+        </div>
+        <hr />
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped" id="items-table" style="width: 100%;">
+                <span id="error" class="text-danger"></span>
+                <thead>
+                    <tr>
+                        <th width="27%">Description</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Code</th>
+                        <th width="20%">Tax</th>
+                        <th>Tax Code</th>
+                        <th>Discount Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.ReceiptItems)
+                    {
+                        <tr id="@item.Id">
+                            <td>
+                                <input type="text" class="form-control" value="@item.Description" disabled />
+                            </td>
+                            <td>
+                                <input class="form-control" type="number" value="@item.Price" disabled />
+                            </td>
+                            <td>
+                                <input class="form-control" type="number" value="@item.Quantity"/>
+                            </td>
+                            <td>
+                                <input type="text" class="form-control" value="@item.Code" />
+                            </td>
+                            <td>
+                                <select class="form-control">
+                                    @if (item.Tax == 0.18)
+                                    {
+                                        <option value="0,18" selected>Standard 18%</option>
+                                        <option value="0">Zero rated 0%</option>
+                                        <option value="0">Special Relief 0%</option>
+                                        <option value="0">Exempt 0%</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="0,18">Standard 18%</option>
+                                        <option value="0" selected>Zero rated 0%</option>
+                                        <option value="0">Special Relief 0%</option>
+                                        <option value="0">Exempt 0%</option>
+                                    }
+                                </select>
+                            </td>
+                            <td>
+                                <input type="text" class="form-control" value="@item.TaxCode"/>
+                            </td>
+                            <td>
+                                <input type="text" class="form-control" value="@item.DiscountAmount"/>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="form-group row">
+                    <div class="col-sm-4"></div>
+                    <div class="col-sm-8">
+                        <input id="edit-btn" type="button" value="Edit" class="btn btn-primary" />
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-sm-4"></div>
+                    <div class="col-sm-8">
+                        <a asp-action="Index">Back to List</a>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="RctDate" class="control-label"></label>
-                <input asp-for="RctDate" class="form-control" />
-                <span asp-validation-for="RctDate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="RctTime" class="control-label"></label>
-                <input asp-for="RctTime" class="form-control" />
-                <span asp-validation-for="RctTime" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="TotalTaxExcl" class="control-label"></label>
-                <input asp-for="TotalTaxExcl" class="form-control" />
-                <span asp-validation-for="TotalTaxExcl" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="TotalTaxIncl" class="control-label"></label>
-                <input asp-for="TotalTaxIncl" class="form-control" />
-                <span asp-validation-for="TotalTaxIncl" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CustName" class="control-label"></label>
-                <input asp-for="CustName" class="form-control" />
-                <span asp-validation-for="CustName" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CustIdType" class="control-label"></label>
-                <input asp-for="CustIdType" class="form-control" />
-                <span asp-validation-for="CustIdType" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CustId" class="control-label"></label>
-                <input asp-for="CustId" class="form-control" />
-                <span asp-validation-for="CustId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CustNum" class="control-label"></label>
-                <input asp-for="CustNum" class="form-control" />
-                <span asp-validation-for="CustNum" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="AccountID" class="control-label"></label>
-                <select asp-for="AccountID" class="form-control" asp-items="ViewBag.AccountID"></select>
-                <span asp-validation-for="AccountID" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
-    </div>
+        </div>
+    </form>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            var products = [];
+            var itemSelect = [];
+            var receiptItems = [];
+            var newRowsData = [];
+            $.get('/Receipts/GetCustomers', function (data) {
+                data.forEach(function (item) {
+                    console.log(item);
+                    var name = item.firstName + ' ' + item.lastName;
+                    $('#custName').append($('<option>', { value: item.id, text: name }));
+                });
+
+                // Ajouter la fonctionnalité de recherche
+                $('#custName').select2({
+                    placeholder: "Select Customer",
+                    theme: "bootstrap4",
+                    allowClear: true
+                });
+            });
+            $('#create-btn').click(function () {
+                var bool = true;
+                var dataItem = [];
+                $('#items-table tr:gt(0)').each(function () {
+                    var item = {};
+                    var i = 0;
+                    $(this).find('input').each(function () {
+                        if (i == 0) {
+                            item.Description = $(this).val();
+                        }
+                        if (i == 1) {
+                            item.Price = $(this).val();
+                        }
+                        if (i == 2) {
+                            if ($(this).val() == '') {
+                                $('#error').text("Quantity is required");
+                                bool = false;
+                            } else {
+                                if ($(this).val() <= 0) {
+                                    $('#error').text('Quantity must be greather than 0');
+                                    bool = false;
+                                } else {
+                                    item.Quantity = $(this).val();
+                                }
+                            }
+                        }
+                        if (i == 3) {
+                            item.Code = $(this).val();
+                        }
+                        if (i == 4) {
+                            item.Tax = $(this).val();
+                        }
+                        if (i == 5) {
+                            item.TaxCode = $(this).val();
+                        }
+                        if (i == 6) {
+                            item.DiscountAmount = $(this).val();
+                        }
+                        i++;
+                    });
+                    item.IsNew = true;
+                    dataItem.push(item);
+                });
+                if (bool) {
+                    var receipt = {
+                        CustName: $('#custName').val(),
+                        PaymentType: $('#payType').val()
+                    };
+                    $.ajax({
+                        url: '/Receipts/CreateReceipt',
+                        type: 'POST',
+                        data: { receipt: receipt, ReceiptItems: dataItem },
+                        success: function (response) {
+                            window.location.href = response.url;
+                            console.log(response);
+                        },
+                        error: function (xhr, status, error) {
+                            console.log(error);
+                        }
+                    });
+                }
+            });
+        });
+
+
+    </script>
+}
 

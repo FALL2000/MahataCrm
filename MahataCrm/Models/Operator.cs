@@ -15,6 +15,9 @@ namespace MahataCrm.Models
         public StatusOperator Status { get; set; }
         public ICollection<Account> Accounts { get; set; }
         public ICollection<Log> Logs { get; set; }
+        public bool HaveConnexion { get; set; } = false;
+        public Profil? Profil { get; set; }
+        public int? ProfilID { get; set; }
         public ICollection<OperatorMatchAccount> OperatorMatchAccounts { get; set; }
     }
 }

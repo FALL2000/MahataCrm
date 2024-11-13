@@ -1,0 +1,146 @@
+﻿@model MahataCrm.Models.Profil
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Profile</h1>
+<hr />
+<style>
+    /* Style pour réduire la taille des cases à cocher */
+    input[type="checkbox"] {
+        transform: scale(0.5); /* Réduit la taille de la case à cocher */
+        margin-right: 5px; /* Marge à droite pour l'espace entre la case à cocher et le texte */
+    }
+</style>
+
+<div class="container">
+    <form>
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <span id="error" class="text-danger"></span>
+                <input asp-for="Id" class="form-control" type="hidden" id="idpro"/>
+                <div class="form-group row">
+                    <div class="col-sm-6">
+                        <label asp-for="Name" class="control-label" >Name</label>
+                        <input asp-for="Name" class="form-control" disabled id="name" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-borderless table-striped" id="items-table" style="{width: 100%;}">
+                <span id="error" class="text-danger"></span>
+                <thead>
+                    <tr>
+                        <th width="35%">Module</th>
+                        <th>Create</th>
+                        <th>Edit</th>
+                        <th>Delete</th>
+                        <th>View</th>
+                        <th>Activate/Desactivate</th>
+                        <th>Assign Service Plan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            Account
+                        </td>
+                        <td><input asp-for="isCreateAccount" class="form-control" type="checkbox" disabled id="isca"/></td>
+                        <td><input asp-for="isUpdateAccount" class="form-control" type="checkbox" disabled id="isua" /></td>
+                        <td><input asp-for="isDeleteAccount" class="form-control" type="checkbox" disabled id="isda" /></td>
+                        <td><input asp-for="isViewAccount" class="form-control" type="checkbox" disabled id="isva" /></td>
+                        <td><input asp-for="isBlockAccount" class="form-control" type="checkbox" disabled id="isba" /></td>
+                        <td><input asp-for="isAssignServicePlan" class="form-control" type="checkbox" disabled id="isaa" /></td>
+                    </tr>
+                    <tr>
+                        <td>Service Plan</td>
+                        <td><input asp-for="isCreateServicePlan" class="form-control" type="checkbox" disabled id="iscs" /></td>
+                        <td><input asp-for="isUpdateServicePlan" class="form-control" type="checkbox" disabled id="isus" /></td>
+                        <td><input asp-for="isDeleteServicePlan" class="form-control" type="checkbox" disabled id="isds" /></td>
+                        <td><input asp-for="isViewServicePlan" class="form-control" type="checkbox" disabled id="isvs" /></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="form-group row">
+                    <div class="col-sm-4"></div>
+                    <div class="col-sm-8">
+                        <input id="editBtn" value="Edit" type="button" class="btn btn-primary" />
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-sm-4"></div>
+                    <div class="col-sm-8">
+                        <a asp-action="Index">Back to List</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+
+    <script>
+        $(document).ready(function () {
+            $('#editBtn').click(function () {
+                var valueBtn = $('#editBtn').attr('value');
+                if (valueBtn == 'Edit') {
+                    $('#editBtn').prop('value', 'Save');
+                    $('input[type="checkbox"]').prop('disabled', false);
+                    $('#name').prop('disabled', false);
+                } else {
+                    $('#error').text('');
+                    var id = $('#idpro').val();
+                    var profil = {
+                        Id: $('#idpro').val(),
+                        Name: $('#name').val(),
+                        isCreateAccount: $('#isca').prop('checked') ? true : false,
+                        isUpdateAccount: $('#isua').prop('checked') ? true : false,
+                        isDeleteAccount: $('#isda').prop('checked') ? true : false,
+                        isBlockAccount: $('#isba').prop('checked') ? true : false,
+                        isViewAccount: $('#isva').prop('checked') ? true : false,
+                        isCreateServicePlan: $('#iscs').prop('checked') ? true : false,
+                        isUpdateServicePlan: $('#isus').prop('checked') ? true : false,
+                        isDeleteServicePlan: $('#isds').prop('checked') ? true : false,
+                        isAssignServicePlan: $('#isaa').prop('checked') ? true : false,
+                        isViewServicePlan: $('#isvs').prop('checked') ? true : false
+                    };
+                    $.ajax({
+                        url: '/Profils/Edit/' + $('#idpro').val(),
+                        type: 'POST',
+                        data: { profil: profil },
+                        success: function (response) {
+                            console.log(response);
+                            if (response.error) {
+                                $('#error').text(response.message);
+                            } else {
+                                window.location.href = response.url;
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            console.log(error);
+                        }
+                    });
+                }
+            });
+        });
+
+
+
+    </script>
+
+
+
+
+
+
+}

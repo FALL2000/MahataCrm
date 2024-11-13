@@ -1,0 +1,91 @@
+﻿@model List<MahataCrm.Models.ZreportViewModel>
+
+@{
+	ViewData["Title"] = "Z-Report";
+}
+
+
+<h1>Z-Report</h1>
+<hr />
+@if (ViewBag.isError == false)
+{
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Z-Report</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>
+                                Report Number
+                            </th>
+                            <th>
+                                Report Date
+                            </th>
+                            <th>
+                                Report Time
+                            </th>
+                            <th>
+                                SubTotal
+                            </th>
+                            <th>
+                                Discount
+                            </th>
+                            <th>
+                                Total
+                            </th>
+                            <th>
+                                VAT
+                            </th>
+                            <th>
+                                Total Gross
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.ReportNumber)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.ReportDate)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.ReportTime)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.SubTotal)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Discount)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Total)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Vat)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.TotalGross)
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+   <p>
+        <h4>Error @ViewBag.ErrorStatus: @ViewBag.Error</h4>
+   </p>   
+}
+
+

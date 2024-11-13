@@ -17,8 +17,9 @@
 }
 
 <div class="card shadow mb-4">
-    <div class="card-header py-3">
+    <div class="card-header d-flex justify-content-between align-items-center">
         <h6 class="m-0 font-weight-bold text-primary">List of Account</h6>
+        <a class="btn btn-primary" asp-action="searchIn">Advanced Search</a>
     </div>
     <div class="card-body">
         <div class="table-responsive">
@@ -41,14 +42,14 @@
                             CertKey
                         </th>
                         <th>
-                            Tax Office
+                            Service Plan
                         </th>
+                        <th>Created At</th>
                         @if (!User.IsInRole("Auditor"))
                         {
                             <th>Edit</th>
                             <th>Delete</th>
                             <th>Block</th>
-                            <th>Details</th>
                             <th>Assign S.P.</th>
                         }
                     </tr>
@@ -56,11 +57,16 @@
                 <tbody>
                     @foreach (var item in Model)
                     {
+                        string sName = string.Empty;
+                        if (item.ServicePlan != null && item.ServicePlan.Name != null)
+                        {
+                            sName = item.ServicePlan.Name.ToUpper();
+                        }
                         string bName = item.BusinessName.ToUpper();
-                        string taxOffice = item.TaxOffice.ToUpper();
+                        //string taxOffice = item.TaxOffice.ToUpper();
                         <tr>
                             <td>
-                                @Html.DisplayFor(modelItem => item.Tin)
+                                <a asp-action="Details" asp-route-id="@item.Id">@Html.DisplayFor(modelItem => item.Tin)</a>
                             </td>
                             <td>
                                 @bName
@@ -74,9 +80,20 @@
                             <td>
                                 @Html.DisplayFor(modelItem => item.Certkey)
                             </td>
-                            <td>
-                                @taxOffice
-                            </td>
+                            @if (String.IsNullOrEmpty(sName))
+                            {
+                                <td>
+                                    NOT ASSIGN
+                                </td>
+                            }
+                            else
+                            {
+                                <td>
+                                    @sName
+                                </td>
+                            }
+                            
+                            <td>@Html.DisplayFor(modelItem => item.CreatedAt)</td>
                             @if (!User.IsInRole("Auditor"))
                             {
                                 <td>
@@ -94,7 +111,6 @@
                                     }
 
                                 </td>
-                                <td><a asp-action="Details" asp-route-id="@item.Id">Details</a></td>
                                 <td><a asp-action="AssignSP" asp-route-id="@item.Id">Assign</a></td>
                             }   
                         </tr>
@@ -105,3 +121,5 @@
         </div>
     </div>
 </div>
+
+

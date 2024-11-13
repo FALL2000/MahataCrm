@@ -1,0 +1,54 @@
+﻿@model IEnumerable<MahataCrm.Models.Product>
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Customer</h1>
+<hr />
+<p>
+    <a class="btn btn-primary" asp-action="Create">New Product</a>
+</p>
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">List of Product</h6>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>
+                            Description
+                        </th>
+                        <th>
+                            Price
+                        </th>
+                        <th>Edit</th>
+                        <th>Delete</th>
+                        <th>Details</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Description)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Price)
+                            </td>
+                            <td>
+                                <a class="btn btn-primary" asp-action="Edit" asp-route-id="@item.Id"><i class="fas fa-fw fa-pencil-alt"></i></a>
+                            </td>
+                            <td><a class="btn btn-danger" asp-action="Delete" asp-route-id="@item.Id"><i class="fas fa-fw fa-trash-alt"></i></a></td>
+                            <td><a asp-action="Details" asp-route-id="@item.Id">Details</a></td>
+                        </tr>
+                    }
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+</div>
+

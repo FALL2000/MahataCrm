@@ -6,7 +6,14 @@
 
 <h1>Delete</h1>
 
-<h3>Are you sure you want to delete this?</h3>
+@if (ViewBag.isDelete == false)
+{
+    <h3>This Account can not be to delete</h3>
+}
+else
+{
+    <h3>Are you sure you want to delete this?</h3>
+}
 <div>
     <h4>Account</h4>
     <hr />
@@ -57,7 +64,10 @@
     
     <form asp-action="Delete">
         <input type="hidden" asp-for="Id" />
-        <input type="submit" value="Delete" class="btn btn-danger" /> |
+        @if (ViewBag.isDelete == true)
+        {
+          <input type="submit" value="Delete" class="btn btn-danger" />
+        }
         <a asp-action="Index">Back to List</a>
     </form>
 </div>

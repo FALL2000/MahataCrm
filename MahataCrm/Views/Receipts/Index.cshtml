@@ -1,4 +1,5 @@
-﻿@model IEnumerable<MahataCrm.Models.Receipt>
+﻿@using System.Reflection
+@model IEnumerable<MahataCrm.Models.Receipt>
 
 @{
     ViewData["Title"] = "Index";
@@ -9,88 +10,11 @@
 <p>
     <a class="btn btn-primary" asp-action="Create">New Receipt</a>
 </p>
-<!--<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.RctNum)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Znum)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.RctDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.TotalTaxExcl)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.TotalTaxIncl)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CustName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CustIdType)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CustId)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CustNum)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Account)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.RctNum)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Znum)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.RctDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.TotalTaxExcl)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.TotalTaxIncl)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CustName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CustIdType)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CustId)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CustNum)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Account.Id)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>-->
 
 <div class="card shadow mb-4">
-    <div class="card-header py-3">
-        <h6 class="m-0 font-weight-bold text-primary">List of Operator</h6>
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h6 class="m-0 font-weight-bold text-primary">List of Receipt</h6>
+        <a class="btn btn-primary" asp-action="search">Advanced Search</a>
     </div>
     <div class="card-body">
         <div class="table-responsive">
@@ -116,14 +40,11 @@
                             Customer Name
                         </th>
                         <th>
-                            Customer Id Type
+                            Payment Type
                         </th>
                         <th>
-                            Customer Id
+                            Posted/ No Posted
                         </th>
-                        <th>
-                            Customer Number
-                        </th>  
                         <th>Details</th>
                     </tr>
                 </thead>
@@ -134,30 +55,51 @@
                             <td>
                                 @Html.DisplayFor(modelItem => item.RctNum)
                             </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.Znum)
-                            </td>
+                            @if (!item.isPost)
+                            {
+                                <td>------</td>    
+                            }
+                            else
+                            {
+                                <td>@Html.DisplayFor(modelItem => item.Znum)</td>
+                            }
                             <td>
                                 @Html.DisplayFor(modelItem => item.RctDate)
                             </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.TotalTaxExcl)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.TotalTaxIncl)
-                            </td>
+                            @if (!item.isPost)
+                            {
+                                <td>------</td>
+                            }
+                            else
+                            {
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.TotalTaxExcl)
+                                </td>
+                            }
+                            @if (!item.isPost)
+                            {
+                                <td>------</td>
+                            }
+                            else
+                            {
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.TotalTaxIncl)
+                                </td>
+                            }
                             <td>
                                 @Html.DisplayFor(modelItem => item.CustName)
                             </td>
                             <td>
-                                @Html.DisplayFor(modelItem => item.CustIdType)
+                                @Html.DisplayFor(modelItem => item.PaymentType)
                             </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.CustId)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.CustNum)
-                            </td>
+                            @if (!item.isPost)
+                            {
+                                <td>NOT POSTED</td>
+                            }
+                            else
+                            {
+                                <td>POSTED</td>
+                            }
                             <td><a asp-action="Details" asp-route-id="@item.Id">Details</a></td>
                         </tr>
                     }

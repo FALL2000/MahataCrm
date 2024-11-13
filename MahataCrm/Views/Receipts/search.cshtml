@@ -1,0 +1,48 @@
+﻿@model MahataCrm.Models.SearchAccountModel
+
+@{
+    ViewData["Title"] = "Advanced Search Receipt";
+}
+
+<h2>Advanced Search Receipt</h2>
+<hr />
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <form asp-action="searchReceipt">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group row">
+                    <div class="col-sm-4">
+                        <label asp-for="FromC" class="control-label">From</label>
+                    </div>
+                    <div class="col-sm-8">
+                        <input id="fromCreate" asp-for="FromC" class="form-control" placeholder="Name" />
+                        <span asp-validation-for="FromC" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-sm-4">
+                        <label asp-for="ToC" class="control-label">To</label>
+                    </div>
+                    <div class="col-sm-8">
+                        <input id="toCreate" asp-for="ToC" class="form-control" placeholder="Name" />
+                        <span asp-validation-for="ToC" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-sm-4"></div>
+                    <div class="col-sm-8">
+                        <input type="submit" value="search" class="btn btn-primary" />
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-sm-4"></div>
+                    <div class="col-sm-8">
+                        <a asp-action="Index">Back to List</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
