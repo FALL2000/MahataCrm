@@ -22,6 +22,7 @@ namespace MahataCrm.Data
         public DbSet<Opt> Opts { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<Customer> Customers { get; set; }
+        public DbSet<TemplateEmail> TemplateEmails { get; set; }
         public DbSet<Profil> Profils { get; set; }
         public DbSet<ReceiptItem> ReceiptItems { get; set; }
         public DbSet<MahataCrm.Models.OperatorCreateViewModel> OperatorCreateViewModel { get; set; } = default!;

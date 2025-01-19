@@ -10,6 +10,7 @@ namespace MahataCrm.Models
         [Range(1, double.MaxValue)]
         public double Price { get; set; }
         public int AccountID { get; set; }
+        public string Category { get; set; }
         public Account? Account { get; set; }
 
     }

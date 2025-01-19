@@ -1,0 +1,125 @@
+﻿@model MahataCrm.Models.TemplateEmail
+    
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Email Template</h1>
+
+<hr />
+
+<div class="container">
+
+    <form method="post">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group row">
+                    <div class="col-sm-6">
+                        <label asp-for="TypeEmail" class="control-label">Email for</label>
+                        <select asp-for="TypeEmail" class="form-control" id="typeEmail">
+                           <option value="0" class="text-danger">Select a value</option>
+                           <option value="CREATE ACCOUNT">Create Account</option>
+                           <option value="DELETE ACCOUNT">Delete Account</option>
+                           <option value="DEACTIVATE ACCOUNT">Deactivate Account</option>
+                           <option value="ASSIGN SERVICE PLAN">Assign/Change Service Plan</option>
+                            <option value="EXPIRATION SERVICE PLAN">Expiration Service Plan</option>
+                        </select>
+                        <span asp-validation-for="TypeEmail" class="text-danger" id="typeEmailValid"></span>
+                    </div>
+                    <div class="col-sm-6">
+                        <label asp-for="Object" class="control-label" id="lblObject">Email Object</label>
+                        <textarea asp-for="Object" id="object" class="form-control" placeholder="Enter Email Object"></textarea>
+                        <span asp-validation-for="Object" class="text-danger" id="objectValid"></span>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-sm-12">
+                        <label asp-for="Header" class="control-label" id="lblHeader">Header</label>
+                        <textarea asp-for="Header" id="header" class="form-control" placeholder="Enter a brief email introduction"></textarea>
+                        <span asp-validation-for="Header" class="text-danger" id="headerValid"></span>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-sm-12">
+                        <label asp-for="Footer" class="control-label" id="lblFooter">Footer</label>
+                        <textarea asp-for="Footer" id="footer" class="form-control" placeholder="Enter a short conclusion (polite formula)"></textarea>
+                        <span asp-validation-for="Footer" class="text-danger" id="footerValid"></span>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-sm-4"></div>
+                    <div class="col-sm-8">
+                        <input id="save-btn" type="button" value="Save" class="btn btn-primary" />
+                    </div>
+                </div>
+            </div>
+        </div>
+       
+    </form>
+</div>
+
+@section Scripts {
+
+    <script>
+        $(document).ready(function () {
+            $('#object').hide();
+            $('#header').hide();
+            $('#footer').hide();
+            $('#typeEmail').change(function(){
+                $('#object').val("");
+                $('#header').val("");
+                $('#footer').val("");
+                var typeEmail = $('#typeEmail').val();
+                $.ajax({
+                    url: 'TemplateEmail/GetTemplate',
+                    type: 'POST',
+                    data: { libelle: typeEmail },
+                    success: function (response) {
+                        console.log(response.text);
+                        if (response.text) {
+                            $('#object').show();
+                            $('#header').show();
+                            $('#footer').show();
+                        } else {
+                            $('#object').val(response.result.object);
+                            $('#header').val(response.result.header);
+                            $('#footer').val(response.result.footer);
+                            $('#object').show();
+                            $('#header').show();
+                            $('#footer').show();
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.log(error);
+                    }
+                });
+            });
+            $('#save-btn').click(function () {
+                var typeEmail = $('#typeEmail').val();
+                var object = $('#object').val();
+                var header = $('#header').val();
+                var footer = $('#footer').val();
+                var tmp = {
+                    TypeEmail: typeEmail,
+                    Header: header,
+                    Object: object,
+                    Footer: footer
+                };
+                $.ajax({
+                    url: 'TemplateEmail/PutTemplate',
+                    type: 'POST',
+                    data: { tmpEmail: tmp, libelle: typeEmail },
+                    success: function (response) {
+                        console.log(response);
+                    },
+                    error: function (xhr, status, error) {
+                        console.log(error);
+                    }
+                });
+            });
+        });
+
+    </script>
+
+}

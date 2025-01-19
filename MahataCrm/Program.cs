@@ -49,6 +49,7 @@ builder.Services.AddAuthorization(options =>
 });
 
 builder.Services.AddScoped<IEmailSender, EmailSender>();
+builder.Services.AddScoped<IWhatsappService, WhatsappService>();
 
 // Configure Quartz.NET
 builder.Services.AddQuartz(q =>

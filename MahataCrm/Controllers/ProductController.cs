@@ -53,7 +53,7 @@ namespace MahataCrm.Controllers
         // POST: ProductController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id, Description, Price")] Product Product)
+        public async Task<IActionResult> Create([Bind("Id, Description, Price, Category")] Product Product)
         {
             if (ModelState.IsValid)
             {

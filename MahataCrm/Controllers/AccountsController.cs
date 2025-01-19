@@ -27,13 +27,15 @@ namespace MahataCrm.Controllers
         private readonly UserManager<Operator> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IEmailSender _emailSender;
+        private readonly IWhatsappService _whatsappService;
 
-        public AccountsController(ApplicationDbContext context, UserManager<Operator> userManager, RoleManager<IdentityRole> roleManager, IEmailSender emailSender)
+        public AccountsController(ApplicationDbContext context, UserManager<Operator> userManager, RoleManager<IdentityRole> roleManager, IEmailSender emailSender, IWhatsappService whatsappService)
         {
             _context = context;
             _userManager = userManager;
             _roleManager = roleManager;
             _emailSender = emailSender;
+            _whatsappService = whatsappService;
         }
 
         // GET: Accounts
@@ -152,6 +154,7 @@ namespace MahataCrm.Controllers
 
                 await _emailSender.SendEmailAsync("axeltsotie@gmail.com", "Account Created",
                             CreateMessage(account.BusinessName, account.Email, account.Password));
+                _whatsappService.EnvoyerNotificationWhatsApp(23793700371, "Account created");
                 TempData["SuccessMessage"] = "L'enregistrement a été effectué avec succès.";
                 return RedirectToAction("Details", "Accounts", new { id = account.Id });
             }
@@ -289,6 +292,7 @@ namespace MahataCrm.Controllers
             await _context.SaveChangesAsync();
             await _emailSender.SendEmailAsync("axeltsotie@gmail.com", "Account Deleded",
                             $"Hello ,'{account.BusinessName}' , Your account deleded successfully");
+            _whatsappService.EnvoyerNotificationWhatsApp(23755612059, "Account Deleded");
             return RedirectToAction(nameof(Index));
         }
 

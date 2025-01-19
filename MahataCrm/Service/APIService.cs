@@ -94,13 +94,6 @@ namespace MahataCrm.Service
 
             using (var client = new HttpClient())
             {
-
-
-
-
-
-
-
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
